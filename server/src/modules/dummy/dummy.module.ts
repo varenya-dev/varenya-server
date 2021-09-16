@@ -1,4 +1,4 @@
-import { FirebaseService } from './../firebase/firebase/firebase.service';
+import { FirebaseService } from '../firebase/firebase.service';
 import { Module } from '@nestjs/common';
 import { DummyController } from './dummy.controller';
 import { DummyService } from './dummy.service';
