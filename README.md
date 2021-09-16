@@ -1,9 +1,8 @@
-# Full Stack TypeScript Starter Project 🌟
+# Varenya Server 🌟
 
-Use this template project to quickly spin up development containers for your project!
+Server implementation for Varenya.
 
 ## Configurations:
- - Client side: ReactJS
  - Server side: NestJS
  - Database: PostgreSQL
  
