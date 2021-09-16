@@ -1,7 +1,6 @@
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
-import { DummyModule } from './modules/dummy/dummy.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './models/user.model';
@@ -22,7 +21,6 @@ import { User } from './models/user.model';
     FirebaseModule,
     AuthModule,
     UserModule,
-    DummyModule,
   ],
   controllers: [],
   providers: [],
