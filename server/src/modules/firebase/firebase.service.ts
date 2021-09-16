@@ -4,6 +4,7 @@ import * as admin from 'firebase-admin';
 @Injectable()
 export class FirebaseService implements OnModuleInit {
   private readonly logger = new Logger(FirebaseService.name);
+  private _firebaseAuth: admin.auth.Auth;
 
   onModuleInit() {
     const serviceAccount = {
@@ -30,5 +31,11 @@ export class FirebaseService implements OnModuleInit {
 
       this.logger.log('Firebase Admin is configured and ready to go');
     }
+
+    this._firebaseAuth = admin.auth();
+  }
+
+  public get firebaseAuth(): admin.auth.Auth {
+    return this._firebaseAuth;
   }
 }
