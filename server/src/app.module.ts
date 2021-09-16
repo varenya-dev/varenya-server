@@ -1,3 +1,4 @@
+import { FirebaseModule } from './modules/firebase/firebase/firebase.module';
 import { DummyModule } from './modules/dummy/dummy.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -15,6 +16,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       logging: true,
       entities: [],
     }),
+    FirebaseModule,
     DummyModule,
   ],
   controllers: [],

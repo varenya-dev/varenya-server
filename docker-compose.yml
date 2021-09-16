@@ -7,6 +7,7 @@ services:
     container_name: varenya_server
     env_file:
       - server.env
+      - firebase-admin.env
     ports:
       - '5000:5000'
     volumes:

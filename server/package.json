@@ -30,6 +30,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "cookie-parser": "^1.4.5",
+    "firebase-admin": "^9.11.1",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "pg": "^8.7.1",
