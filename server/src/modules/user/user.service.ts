@@ -10,6 +10,12 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  public async findOneUserByFirebaseId(firebaseId: string): Promise<User> {
+    return await this.userRepository.findOne({
+      firebaseId,
+    });
+  }
+
   public async saveUser(user: User): Promise<User> {
     return await this.userRepository.save(user);
   }
