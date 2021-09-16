@@ -23,6 +23,7 @@ services:
     container_name: varenya_postgres
     restart: always
     ports:
+      - '127.0.0.1:8888:5432'
       - '5432:5432'
     env_file:
       - postgres.env
