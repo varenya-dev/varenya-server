@@ -4,6 +4,7 @@ import { Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthUser } from 'src/decorators/auth-user.decorator';
 import { auth } from 'firebase-admin';
 import { User } from 'src/models/user.model';
+import { Roles } from 'src/enum/roles.enum';
 
 @Controller('auth')
 export class AuthController {
