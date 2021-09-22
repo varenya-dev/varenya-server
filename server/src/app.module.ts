@@ -1,3 +1,4 @@
+import { ChatModule } from './modules/chat/chat.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
@@ -19,8 +20,9 @@ import { User } from './models/user.model';
       entities: [User],
     }),
     FirebaseModule,
-    AuthModule,
     UserModule,
+    AuthModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],
