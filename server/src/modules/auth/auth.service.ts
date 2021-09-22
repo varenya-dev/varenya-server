@@ -3,6 +3,7 @@ import { FirebaseService } from './../firebase/firebase.service';
 import { Injectable } from '@nestjs/common';
 import { auth } from 'firebase-admin';
 import { User } from 'src/models/user.model';
+import { Roles } from 'src/enum/roles.enum';
 
 @Injectable()
 export class AuthService {
