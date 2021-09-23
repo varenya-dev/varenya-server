@@ -22,13 +22,18 @@ export class ChatService {
       (participant) => participant !== loggedInUser.uid,
     );
 
+    console.log(filteredParticipants);
+
     const fcmTokens = await this.fetchFcmTokensByUserIds(filteredParticipants);
+
+    console.log(fcmTokens);
 
     await this.firebaseService.firebaseMessaging.sendToDevice(
       fcmTokens,
       {
         data: {
           owner: JSON.stringify(loggedInUser),
+          thread: threadId,
         },
       },
       {
