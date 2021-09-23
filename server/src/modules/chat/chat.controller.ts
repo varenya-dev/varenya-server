@@ -9,7 +9,7 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @UseGuards(FirebaseAuthGuard)
-  @Post('sendNotification')
+  @Post('notification')
   public async sendNotificationToDevices(
     @AuthUser() firebaseUser: auth.UserRecord,
     @Body('threadId') threadId: string,
