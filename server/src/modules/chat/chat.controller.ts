@@ -13,10 +13,12 @@ export class ChatController {
   public async sendNotificationToDevices(
     @AuthUser() firebaseUser: auth.UserRecord,
     @Body('threadId') threadId: string,
+    @Body('message') message: string,
   ): Promise<void> {
     return await this.chatService.sendNotificationToDevices(
       firebaseUser,
       threadId,
+      message,
     );
   }
 }

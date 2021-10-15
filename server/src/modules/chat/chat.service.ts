@@ -1,5 +1,5 @@
 import { FirebaseService } from './../firebase/firebase.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Body } from '@nestjs/common';
 import { auth } from 'firebase-admin';
 
 @Injectable()
@@ -9,6 +9,7 @@ export class ChatService {
   public async sendNotificationToDevices(
     loggedInUser: auth.UserRecord,
     threadId: string,
+    message: string,
   ): Promise<void> {
     const thread = (
       await this.firebaseService.firebaseFirestore
@@ -21,19 +22,17 @@ export class ChatService {
     const filteredParticipants = participants.filter(
       (participant) => participant !== loggedInUser.uid,
     );
-
-    console.log(filteredParticipants);
-
     const fcmTokens = await this.fetchFcmTokensByUserIds(filteredParticipants);
-
-    console.log(fcmTokens);
-
     await this.firebaseService.firebaseMessaging.sendToDevice(
       fcmTokens,
       {
         data: {
-          owner: JSON.stringify(loggedInUser),
           thread: threadId,
+          type: 'chat',
+        },
+        notification: {
+          title: `${loggedInUser.displayName} sent you a message!`,
+          body: message,
         },
       },
       {
