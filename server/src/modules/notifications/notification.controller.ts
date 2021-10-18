@@ -11,7 +11,7 @@ export class NotificationController {
 
   @UseGuards(FirebaseAuthGuard)
   @Post('chat')
-  public async sendNotificationToDevices(
+  public async handleChatNotifications(
     @AuthUser() firebaseUser: auth.UserRecord,
     @Body() chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
@@ -19,5 +19,13 @@ export class NotificationController {
       firebaseUser,
       chatNotificationDto,
     );
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('sos')
+  public async handleSOSNotifications(
+    @AuthUser() firebaseUser: auth.UserRecord,
+  ): Promise<void> {
+    return await this.notificationService.handleSOSNotifications(firebaseUser);
   }
 }
