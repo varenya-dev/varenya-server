@@ -1,3 +1,4 @@
+import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Injectable, Body } from '@nestjs/common';
 import { auth } from 'firebase-admin';
@@ -6,15 +7,14 @@ import { auth } from 'firebase-admin';
 export class NotificationService {
   constructor(private readonly firebaseService: FirebaseService) {}
 
-  public async sendNotificationToDevices(
+  public async handleChatNotifications(
     loggedInUser: auth.UserRecord,
-    threadId: string,
-    message: string,
+    chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
     const thread = (
       await this.firebaseService.firebaseFirestore
         .collection('threads')
-        .doc(threadId)
+        .doc(chatNotificationDto.threadId)
         .get()
     ).data();
 
@@ -27,12 +27,12 @@ export class NotificationService {
       fcmTokens,
       {
         data: {
-          thread: threadId,
+          thread: chatNotificationDto.threadId,
           type: 'chat',
         },
         notification: {
           title: `${loggedInUser.displayName} sent you a message!`,
-          body: message,
+          body: chatNotificationDto.message,
         },
       },
       {

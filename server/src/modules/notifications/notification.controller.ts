@@ -1,3 +1,4 @@
+import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { auth } from 'firebase-admin';
 import { AuthUser } from '../../decorators/auth-user.decorator';
 import { FirebaseAuthGuard } from '../../guards/firebase-auth.guard';
@@ -12,13 +13,11 @@ export class NotificationController {
   @Post('chat')
   public async sendNotificationToDevices(
     @AuthUser() firebaseUser: auth.UserRecord,
-    @Body('threadId') threadId: string,
-    @Body('message') message: string,
+    @Body() chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
-    return await this.notificationService.sendNotificationToDevices(
+    return await this.notificationService.handleChatNotifications(
       firebaseUser,
-      threadId,
-      message,
+      chatNotificationDto,
     );
   }
 }
