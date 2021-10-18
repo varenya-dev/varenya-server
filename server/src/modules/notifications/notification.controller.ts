@@ -1,3 +1,4 @@
+import { ResponseNotificationDto } from './../../dto/notification/response-notification.dto';
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { auth } from 'firebase-admin';
 import { AuthUser } from '../../decorators/auth-user.decorator';
@@ -27,5 +28,17 @@ export class NotificationController {
     @AuthUser() firebaseUser: auth.UserRecord,
   ): Promise<void> {
     return await this.notificationService.handleSOSNotifications(firebaseUser);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('sos/response')
+  public async handleSOSResponseNotifications(
+    @AuthUser() firebaseUser: auth.UserRecord,
+    @Body() responseNotificationDto: ResponseNotificationDto,
+  ): Promise<void> {
+    return await this.notificationService.handleSOSResponseNotifications(
+      responseNotificationDto,
+      firebaseUser,
+    );
   }
 }
