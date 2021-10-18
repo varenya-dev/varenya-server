@@ -17,9 +17,7 @@ export class FirebaseAuthGuard implements CanActivate {
     private readonly firebaseService: FirebaseService,
   ) {}
 
-  private async validateAuthenticationHeader(
-    request: Request,
-  ): Promise<boolean> {
+  private async validateAuthenticationHeader(request): Promise<boolean> {
     try {
       if (
         request.headers.authorization &&
