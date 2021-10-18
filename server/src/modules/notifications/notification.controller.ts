@@ -1,12 +1,12 @@
 import { auth } from 'firebase-admin';
-import { AuthUser } from './../../decorators/auth-user.decorator';
-import { FirebaseAuthGuard } from './../../guards/firebase-auth.guard';
-import { ChatService } from './chat.service';
+import { AuthUser } from '../../decorators/auth-user.decorator';
+import { FirebaseAuthGuard } from '../../guards/firebase-auth.guard';
+import { NotificationService } from './notification.service';
 import { Controller, UseGuards, Post, Body } from '@nestjs/common';
 
 @Controller('chat')
-export class ChatController {
-  constructor(private readonly chatService: ChatService) {}
+export class NotificationController {
+  constructor(private readonly notificationService: NotificationService) {}
 
   @UseGuards(FirebaseAuthGuard)
   @Post('notification')
@@ -15,7 +15,7 @@ export class ChatController {
     @Body('threadId') threadId: string,
     @Body('message') message: string,
   ): Promise<void> {
-    return await this.chatService.sendNotificationToDevices(
+    return await this.notificationService.sendNotificationToDevices(
       firebaseUser,
       threadId,
       message,

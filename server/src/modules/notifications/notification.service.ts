@@ -1,9 +1,9 @@
-import { FirebaseService } from './../firebase/firebase.service';
+import { FirebaseService } from '../firebase/firebase.service';
 import { Injectable, Body } from '@nestjs/common';
 import { auth } from 'firebase-admin';
 
 @Injectable()
-export class ChatService {
+export class NotificationService {
   constructor(private readonly firebaseService: FirebaseService) {}
 
   public async sendNotificationToDevices(

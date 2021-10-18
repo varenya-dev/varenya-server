@@ -1,4 +1,4 @@
-import { ChatModule } from './modules/chat/chat.module';
+import { NotificationModule } from './modules/notifications/notification.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
@@ -22,7 +22,7 @@ import { User } from './models/user.model';
     FirebaseModule,
     UserModule,
     AuthModule,
-    ChatModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [],
