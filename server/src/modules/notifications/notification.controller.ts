@@ -1,3 +1,4 @@
+import { ResponseNotificationDto } from './../../dto/notification/response-notification.dto';
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { auth } from 'firebase-admin';
 import { AuthUser } from '../../decorators/auth-user.decorator';
@@ -11,13 +12,33 @@ export class NotificationController {
 
   @UseGuards(FirebaseAuthGuard)
   @Post('chat')
-  public async sendNotificationToDevices(
+  public async handleChatNotifications(
     @AuthUser() firebaseUser: auth.UserRecord,
     @Body() chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
     return await this.notificationService.handleChatNotifications(
       firebaseUser,
       chatNotificationDto,
+    );
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('sos')
+  public async handleSOSNotifications(
+    @AuthUser() firebaseUser: auth.UserRecord,
+  ): Promise<void> {
+    return await this.notificationService.handleSOSNotifications(firebaseUser);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post('sos/response')
+  public async handleSOSResponseNotifications(
+    @AuthUser() firebaseUser: auth.UserRecord,
+    @Body() responseNotificationDto: ResponseNotificationDto,
+  ): Promise<void> {
+    return await this.notificationService.handleSOSResponseNotifications(
+      responseNotificationDto,
+      firebaseUser,
     );
   }
 }
