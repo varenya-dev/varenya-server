@@ -42,15 +42,30 @@ export class NotificationService {
     );
   }
 
+  public async handleSOSNotifications(
+    loggedInUser: auth.UserRecord,
+  ): Promise<void> {
+    await this.firebaseService.firebaseMessaging.sendToTopic('sos', {
+      data: {
+        type: 'sos',
+        userId: loggedInUser.uid,
+      },
+      notification: {
+        title: 'Someone is calling for help!',
+        body: 'Tap this notification to help them!',
+      },
+    });
+  }
+
   private async fetchFcmTokensByUserIds(userIds: string[]): Promise<string[]> {
     const fcmTokens = [];
 
-    const fcmTokensDocs = (
-      await this.firebaseService.firebaseFirestore
-        .collection('users')
-        .where('id', 'in', userIds)
-        .get()
-    ).forEach((document) => {
+    const fcmTokensDocs = await this.firebaseService.firebaseFirestore
+      .collection('users')
+      .where('id', 'in', userIds)
+      .get();
+
+    fcmTokensDocs.forEach((document) => {
       fcmTokens.push(document.data()['token']);
     });
 
