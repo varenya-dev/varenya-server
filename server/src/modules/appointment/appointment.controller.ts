@@ -2,7 +2,7 @@ import { Appointment } from 'src/models/appointment.model';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { AuthUser } from 'src/decorators/auth-user.decorator';
 import { AppointmentService } from './appointment.service';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { FirebaseAuthGuard } from 'src/guards/firebase-auth.guard';
 import { auth } from 'firebase-admin';
 import { PatientAppointmentResponse } from 'src/dto/appointment/patient-appointment-response.dto';
@@ -38,5 +38,13 @@ export class AppointmentController {
       firebaseUser,
       createAppointmentDto,
     );
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Put()
+  public async updateAppointment(
+    @Body() appointment: Appointment,
+  ): Promise<Appointment> {
+    return await this.appointmentService.updateAppointment(appointment);
   }
 }
