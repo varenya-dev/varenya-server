@@ -141,4 +141,20 @@ export class NotificationService {
       },
     });
   }
+
+  public async handleAppointmentDeleteNotification(
+    recipientIds: string[],
+  ): Promise<void> {
+    const fcmTokens = await this.fetchFcmTokensByUserIds(recipientIds);
+
+    await this.firebaseService.firebaseMessaging.sendToDevice(fcmTokens, {
+      data: {
+        type: 'appointment',
+      },
+      notification: {
+        title: 'Appointment Cancelled',
+        body: 'Tap this notification to view.',
+      },
+    });
+  }
 }

@@ -172,6 +172,18 @@ export class AppointmentService {
   public async deleteAppointment(
     appointment: Appointment,
   ): Promise<Appointment> {
+    const appointmentDb = await this.appointmentRepository.findOne({
+      where: {
+        id: appointment.id,
+      },
+      relations: ['patientUser', 'doctorUser'],
+    });
+
+    await this.notificationService.handleAppointmentDeleteNotification([
+      appointmentDb.doctorUser.firebaseId,
+      appointmentDb.patientUser.firebaseId,
+    ]);
+
     return await this.appointmentRepository.remove(appointment);
   }
 }
