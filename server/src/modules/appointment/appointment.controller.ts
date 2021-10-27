@@ -1,6 +1,8 @@
+import { Appointment } from 'src/models/appointment.model';
+import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { AuthUser } from 'src/decorators/auth-user.decorator';
 import { AppointmentService } from './appointment.service';
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { FirebaseAuthGuard } from 'src/guards/firebase-auth.guard';
 import { auth } from 'firebase-admin';
 import { PatientAppointmentResponse } from 'src/dto/appointment/patient-appointment-response.dto';
@@ -24,5 +26,17 @@ export class AppointmentController {
     @AuthUser() firebaseUser: auth.UserRecord,
   ): Promise<DoctorAppointmentResponse[]> {
     return await this.appointmentService.getDoctorAppointments(firebaseUser);
+  }
+
+  @UseGuards(FirebaseAuthGuard)
+  @Post()
+  public async createNewAppointment(
+    @AuthUser() firebaseUser: auth.UserRecord,
+    @Body() createAppointmentDto: CreateAppointmentDto,
+  ): Promise<Appointment> {
+    return await this.appointmentService.createNewAppointment(
+      firebaseUser,
+      createAppointmentDto,
+    );
   }
 }
