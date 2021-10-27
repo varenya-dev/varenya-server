@@ -155,6 +155,17 @@ export class AppointmentService {
   public async updateAppointment(
     updatedAppointment: Appointment,
   ): Promise<Appointment> {
+    const appointment = await this.appointmentRepository.findOne({
+      where: {
+        id: updatedAppointment.id,
+      },
+      relations: ['patientUser'],
+    });
+
+    await this.notificationService.handleAppointmentUpdateNotification(
+      appointment.patientUser.firebaseId,
+    );
+
     return await this.appointmentRepository.save(updatedAppointment);
   }
 
