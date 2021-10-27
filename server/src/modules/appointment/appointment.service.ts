@@ -1,3 +1,4 @@
+import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
 import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
 import { FirebaseService } from './../firebase/firebase.service';
@@ -121,5 +122,28 @@ export class AppointmentService {
     );
 
     return patientDetails;
+  }
+
+  public async createNewAppointment(
+    loggedInUser: auth.UserRecord,
+    createAppointmentDto: CreateAppointmentDto,
+  ): Promise<Appointment> {
+    const patientUser = await this.userService.findOneUserByFirebaseId(
+      loggedInUser.uid,
+    );
+
+    if (patientUser.role !== Roles.Main) {
+      throw new ForbiddenException({
+        message: 'Forbidden to access this endpoint',
+      });
+    }
+
+    const doctorUser = await this.userService.findOneUserByFirebaseId(
+      createAppointmentDto.doctorId,
+    );
+
+    const appointmentDetails = new Appointment(patientUser, doctorUser);
+
+    return await this.appointmentRepository.save(appointmentDetails);
   }
 }
