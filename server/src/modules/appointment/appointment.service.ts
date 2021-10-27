@@ -40,7 +40,7 @@ export class AppointmentService {
       where: {
         patientUser: patientUser,
       },
-      relations: ['doctorUser'],
+      relations: ['doctorUser', 'patientUser'],
     });
 
     const mappedAppointments = await Promise.all(
@@ -73,7 +73,7 @@ export class AppointmentService {
       where: {
         doctorUser: doctorUser,
       },
-      relations: ['patientUser'],
+      relations: ['doctorUser', 'patientUser'],
     });
 
     const mappedAppointments = await Promise.all(
