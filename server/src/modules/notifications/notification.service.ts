@@ -101,4 +101,60 @@ export class NotificationService {
 
     return fcmTokens;
   }
+
+  public async handleAppointmentCreationNotification(
+    recipientId: string,
+  ): Promise<void> {
+    const fcmTokenDoc = await this.firebaseService.firebaseFirestore
+      .collection('users')
+      .doc(recipientId)
+      .get();
+    const fcmToken = fcmTokenDoc.data()['token'];
+
+    await this.firebaseService.firebaseMessaging.sendToDevice(fcmToken, {
+      data: {
+        type: 'appointment',
+      },
+      notification: {
+        title: 'Someone requests for an appointment!',
+        body: 'Tap this notification to confirm or cancel the appointment.',
+      },
+    });
+  }
+
+  public async handleAppointmentUpdateNotification(
+    recipientId: string,
+  ): Promise<void> {
+    const fcmTokenDoc = await this.firebaseService.firebaseFirestore
+      .collection('users')
+      .doc(recipientId)
+      .get();
+    const fcmToken = fcmTokenDoc.data()['token'];
+
+    await this.firebaseService.firebaseMessaging.sendToDevice(fcmToken, {
+      data: {
+        type: 'appointment',
+      },
+      notification: {
+        title: 'An update on one of your appointments!',
+        body: 'Tap this notification to view the update.',
+      },
+    });
+  }
+
+  public async handleAppointmentDeleteNotification(
+    recipientIds: string[],
+  ): Promise<void> {
+    const fcmTokens = await this.fetchFcmTokensByUserIds(recipientIds);
+
+    await this.firebaseService.firebaseMessaging.sendToDevice(fcmTokens, {
+      data: {
+        type: 'appointment',
+      },
+      notification: {
+        title: 'Appointment Cancelled',
+        body: 'Tap this notification to view.',
+      },
+    });
+  }
 }

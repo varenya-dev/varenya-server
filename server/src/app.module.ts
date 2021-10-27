@@ -1,3 +1,5 @@
+import { AppointmentModule } from './modules/appointment/appointment.module';
+import { Appointment } from './models/appointment.model';
 import { NotificationModule } from './modules/notifications/notification.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -17,12 +19,13 @@ import { User } from './models/user.model';
       database: process.env.DATABASE_NAME,
       synchronize: true,
       logging: true,
-      entities: [User],
+      entities: [User, Appointment],
     }),
     FirebaseModule,
     UserModule,
     AuthModule,
     NotificationModule,
+    AppointmentModule,
   ],
   controllers: [],
   providers: [],
