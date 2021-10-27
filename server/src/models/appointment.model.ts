@@ -7,6 +7,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { User } from './user.model';
+import { ConfirmationStatus } from './../enum/confirmation-status.enum';
 
 @Entity()
 export class Appointment {
@@ -16,7 +17,7 @@ export class Appointment {
   @Column()
   scheduledFor: Date;
 
-  @Column()
+  @Column({ default: ConfirmationStatus.Pending })
   status: ConfirmationStatus;
 
   @CreateDateColumn()
@@ -35,8 +36,8 @@ export class Appointment {
   })
   doctorUser: User;
 
-  constructor(scheduledFor: Date, patientUser: User, doctorUser: User) {
-    this.scheduledFor = scheduledFor;
+  constructor(patientUser: User, doctorUser: User) {
+    this.scheduledFor = new Date(Date.now());
     this.patientUser = patientUser;
     this.doctorUser = doctorUser;
   }
