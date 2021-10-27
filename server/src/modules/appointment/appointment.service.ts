@@ -146,4 +146,10 @@ export class AppointmentService {
 
     return await this.appointmentRepository.save(appointmentDetails);
   }
+
+  public async updateAppointment(
+    updatedAppointment: Appointment,
+  ): Promise<Appointment> {
+    return await this.appointmentRepository.save(updatedAppointment);
+  }
 }
