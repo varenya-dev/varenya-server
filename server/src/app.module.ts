@@ -1,3 +1,4 @@
+import { AppointmentModule } from './modules/appointment/appointment.module';
 import { Appointment } from './models/appointment.model';
 import { NotificationModule } from './modules/notifications/notification.module';
 import { UserModule } from './modules/user/user.module';
@@ -24,6 +25,7 @@ import { User } from './models/user.model';
     UserModule,
     AuthModule,
     NotificationModule,
+    AppointmentModule,
   ],
   controllers: [],
   providers: [],
