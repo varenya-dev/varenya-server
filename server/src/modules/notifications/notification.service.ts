@@ -101,4 +101,24 @@ export class NotificationService {
 
     return fcmTokens;
   }
+
+  public async handleAppointmentCreationNotification(
+    recipientId: string,
+  ): Promise<void> {
+    const fcmTokenDoc = await this.firebaseService.firebaseFirestore
+      .collection('users')
+      .doc(recipientId)
+      .get();
+    const fcmToken = fcmTokenDoc.data()['token'];
+
+    await this.firebaseService.firebaseMessaging.sendToDevice(fcmToken, {
+      data: {
+        type: 'appointment',
+      },
+      notification: {
+        title: 'Someone requests for an appointment!',
+        body: 'Tap this notification to confirm or cancel the appointment.',
+      },
+    });
+  }
 }

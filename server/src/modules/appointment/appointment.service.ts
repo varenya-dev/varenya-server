@@ -1,3 +1,4 @@
+import { NotificationService } from './../notifications/notification.service';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
 import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
@@ -19,8 +20,8 @@ export class AppointmentService {
     private readonly appointmentRepository: Repository<Appointment>,
 
     private readonly userService: UserService,
-
     private readonly firebaseService: FirebaseService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   public async getPatientAppointments(
@@ -143,6 +144,10 @@ export class AppointmentService {
     );
 
     const appointmentDetails = new Appointment(patientUser, doctorUser);
+
+    await this.notificationService.handleAppointmentCreationNotification(
+      createAppointmentDto.doctorId,
+    );
 
     return await this.appointmentRepository.save(appointmentDetails);
   }
