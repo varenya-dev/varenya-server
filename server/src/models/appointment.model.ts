@@ -16,6 +16,9 @@ export class Appointment {
   @Column()
   scheduledFor: Date;
 
+  @Column()
+  status: ConfirmationStatus;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -31,4 +34,10 @@ export class Appointment {
     onDelete: 'CASCADE',
   })
   doctorUser: User;
+
+  constructor(scheduledFor: Date, patientUser: User, doctorUser: User) {
+    this.scheduledFor = scheduledFor;
+    this.patientUser = patientUser;
+    this.doctorUser = doctorUser;
+  }
 }
