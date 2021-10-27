@@ -152,4 +152,10 @@ export class AppointmentService {
   ): Promise<Appointment> {
     return await this.appointmentRepository.save(updatedAppointment);
   }
+
+  public async deleteAppointment(
+    appointment: Appointment,
+  ): Promise<Appointment> {
+    return await this.appointmentRepository.remove(appointment);
+  }
 }
