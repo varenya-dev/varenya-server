@@ -2,7 +2,7 @@ import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { ResponseNotificationDto } from './../../dto/notification/response-notification.dto';
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
-import { Injectable, Body } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class NotificationService {
@@ -12,33 +12,20 @@ export class NotificationService {
     loggedInUser: LoggedInUser,
     chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
-    const thread = (
-      await this.firebaseService.firebaseFirestore
-        .collection('threads')
-        .doc(chatNotificationDto.threadId)
-        .get()
-    ).data();
-
-    const participants = thread['participants'];
-    const filteredParticipants = participants.filter(
-      (participant) => participant !== loggedInUser.firebaseUser.uid,
+    const filteredParticipants = await this.fetchParticipantsByThreads(
+      chatNotificationDto.threadId,
+      loggedInUser,
     );
-    const fcmTokens = await this.fetchFcmTokensByUserIds(filteredParticipants);
-    await this.firebaseService.firebaseMessaging.sendToDevice(
-      fcmTokens,
+
+    await this.sendNotification(
+      filteredParticipants,
       {
-        data: {
-          thread: chatNotificationDto.threadId,
-          type: 'chat',
-        },
-        notification: {
-          title: `${loggedInUser.firebaseUser.displayName} sent you a message!`,
-          body: chatNotificationDto.message,
-        },
+        thread: chatNotificationDto.threadId,
+        type: 'chat',
       },
       {
-        contentAvailable: true,
-        priority: 'high',
+        title: `${loggedInUser.firebaseUser.displayName} sent you a message!`,
+        body: chatNotificationDto.message,
       },
     );
   }
@@ -62,10 +49,77 @@ export class NotificationService {
     responseNotificationDto: ResponseNotificationDto,
     loggedInUser: LoggedInUser,
   ): Promise<void> {
+    const filteredParticipants = await this.fetchParticipantsByThreads(
+      responseNotificationDto.threadId,
+      loggedInUser,
+    );
+
+    await this.sendNotification(
+      filteredParticipants,
+      {
+        type: 'chat',
+        thread: responseNotificationDto.threadId,
+      },
+      {
+        title: 'Someone replied!',
+        body: 'Tap this notification to start a conversation.',
+      },
+    );
+  }
+
+  public async handleAppointmentCreationNotification(
+    recipientId: string,
+  ): Promise<void> {
+    await this.sendNotification(
+      [recipientId],
+      {
+        type: 'appointment',
+      },
+      {
+        title: 'Someone requests for an appointment!',
+        body: 'Tap this notification to confirm or cancel the appointment.',
+      },
+    );
+  }
+
+  public async handleAppointmentUpdateNotification(
+    recipientId: string,
+  ): Promise<void> {
+    await this.sendNotification(
+      [recipientId],
+      {
+        type: 'appointment',
+      },
+      {
+        title: 'An update on one of your appointments!',
+        body: 'Tap this notification to view the update.',
+      },
+    );
+  }
+
+  public async handleAppointmentDeleteNotification(
+    recipientIds: string[],
+  ): Promise<void> {
+    await this.sendNotification(
+      recipientIds,
+      {
+        type: 'appointment',
+      },
+      {
+        title: 'Appointment Cancelled',
+        body: 'Tap this notification to view.',
+      },
+    );
+  }
+
+  private async fetchParticipantsByThreads(
+    threadId: string,
+    loggedInUser: LoggedInUser,
+  ): Promise<string[]> {
     const thread = (
       await this.firebaseService.firebaseFirestore
         .collection('threads')
-        .doc(responseNotificationDto.threadId)
+        .doc(threadId)
         .get()
     ).data();
 
@@ -73,18 +127,8 @@ export class NotificationService {
     const filteredParticipants = participants.filter(
       (participant) => participant !== loggedInUser.firebaseUser.uid,
     );
-    const fcmTokens = await this.fetchFcmTokensByUserIds(filteredParticipants);
 
-    await this.firebaseService.firebaseMessaging.sendToDevice(fcmTokens, {
-      data: {
-        type: 'chat',
-        thread: responseNotificationDto.threadId,
-      },
-      notification: {
-        title: 'Someone replied!',
-        body: 'Tap this notification to start a conversation.',
-      },
-    });
+    return filteredParticipants;
   }
 
   private async fetchFcmTokensByUserIds(userIds: string[]): Promise<string[]> {
@@ -102,59 +146,23 @@ export class NotificationService {
     return fcmTokens;
   }
 
-  public async handleAppointmentCreationNotification(
-    recipientId: string,
-  ): Promise<void> {
-    const fcmTokenDoc = await this.firebaseService.firebaseFirestore
-      .collection('users')
-      .doc(recipientId)
-      .get();
-    const fcmToken = fcmTokenDoc.data()['token'];
-
-    await this.firebaseService.firebaseMessaging.sendToDevice(fcmToken, {
-      data: {
-        type: 'appointment',
-      },
-      notification: {
-        title: 'Someone requests for an appointment!',
-        body: 'Tap this notification to confirm or cancel the appointment.',
-      },
-    });
-  }
-
-  public async handleAppointmentUpdateNotification(
-    recipientId: string,
-  ): Promise<void> {
-    const fcmTokenDoc = await this.firebaseService.firebaseFirestore
-      .collection('users')
-      .doc(recipientId)
-      .get();
-    const fcmToken = fcmTokenDoc.data()['token'];
-
-    await this.firebaseService.firebaseMessaging.sendToDevice(fcmToken, {
-      data: {
-        type: 'appointment',
-      },
-      notification: {
-        title: 'An update on one of your appointments!',
-        body: 'Tap this notification to view the update.',
-      },
-    });
-  }
-
-  public async handleAppointmentDeleteNotification(
+  private async sendNotification(
     recipientIds: string[],
+    data: any,
+    notification: { title: string; body: string },
   ): Promise<void> {
     const fcmTokens = await this.fetchFcmTokensByUserIds(recipientIds);
 
-    await this.firebaseService.firebaseMessaging.sendToDevice(fcmTokens, {
-      data: {
-        type: 'appointment',
+    await this.firebaseService.firebaseMessaging.sendToDevice(
+      fcmTokens,
+      {
+        data: data,
+        notification: notification,
       },
-      notification: {
-        title: 'Appointment Cancelled',
-        body: 'Tap this notification to view.',
+      {
+        contentAvailable: true,
+        priority: 'high',
       },
-    });
+    );
   }
 }
