@@ -1,3 +1,4 @@
+import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { ResponseNotificationDto } from './../../dto/notification/response-notification.dto';
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
@@ -9,7 +10,7 @@ export class NotificationService {
   constructor(private readonly firebaseService: FirebaseService) {}
 
   public async handleChatNotifications(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
     chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
     const thread = (
@@ -21,7 +22,7 @@ export class NotificationService {
 
     const participants = thread['participants'];
     const filteredParticipants = participants.filter(
-      (participant) => participant !== loggedInUser.uid,
+      (participant) => participant !== loggedInUser.firebaseUser.uid,
     );
     const fcmTokens = await this.fetchFcmTokensByUserIds(filteredParticipants);
     await this.firebaseService.firebaseMessaging.sendToDevice(
@@ -32,7 +33,7 @@ export class NotificationService {
           type: 'chat',
         },
         notification: {
-          title: `${loggedInUser.displayName} sent you a message!`,
+          title: `${loggedInUser.firebaseUser.displayName} sent you a message!`,
           body: chatNotificationDto.message,
         },
       },
@@ -44,12 +45,12 @@ export class NotificationService {
   }
 
   public async handleSOSNotifications(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
   ): Promise<void> {
     await this.firebaseService.firebaseMessaging.sendToTopic('sos', {
       data: {
         type: 'sos',
-        userId: loggedInUser.uid,
+        userId: loggedInUser.firebaseUser.uid,
       },
       notification: {
         title: 'Someone is calling for help!',
@@ -60,7 +61,7 @@ export class NotificationService {
 
   public async handleSOSResponseNotifications(
     responseNotificationDto: ResponseNotificationDto,
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
   ): Promise<void> {
     const thread = (
       await this.firebaseService.firebaseFirestore
@@ -71,7 +72,7 @@ export class NotificationService {
 
     const participants = thread['participants'];
     const filteredParticipants = participants.filter(
-      (participant) => participant !== loggedInUser.uid,
+      (participant) => participant !== loggedInUser.firebaseUser.uid,
     );
     const fcmTokens = await this.fetchFcmTokensByUserIds(filteredParticipants);
 

@@ -1,3 +1,4 @@
+import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { RoleAuthGuard } from 'src/guards/role-auth.guard';
 import { ResponseNotificationDto } from './../../dto/notification/response-notification.dto';
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
@@ -16,11 +17,11 @@ export class NotificationController {
   @Post('chat')
   @Role(Roles.Main, Roles.Professional)
   public async handleChatNotifications(
-    @AuthUser() firebaseUser: auth.UserRecord,
+    @AuthUser() loggedInUser: LoggedInUser,
     @Body() chatNotificationDto: ChatNotificationDto,
   ): Promise<void> {
     return await this.notificationService.handleChatNotifications(
-      firebaseUser,
+      loggedInUser,
       chatNotificationDto,
     );
   }
@@ -28,20 +29,20 @@ export class NotificationController {
   @Post('sos')
   @Role(Roles.Main)
   public async handleSOSNotifications(
-    @AuthUser() firebaseUser: auth.UserRecord,
+    @AuthUser() loggedInUser: LoggedInUser,
   ): Promise<void> {
-    return await this.notificationService.handleSOSNotifications(firebaseUser);
+    return await this.notificationService.handleSOSNotifications(loggedInUser);
   }
 
   @Post('sos/response')
   @Role(Roles.Main, Roles.Professional)
   public async handleSOSResponseNotifications(
-    @AuthUser() firebaseUser: auth.UserRecord,
+    @AuthUser() loggedInUser: LoggedInUser,
     @Body() responseNotificationDto: ResponseNotificationDto,
   ): Promise<void> {
     return await this.notificationService.handleSOSResponseNotifications(
       responseNotificationDto,
-      firebaseUser,
+      loggedInUser,
     );
   }
 }
