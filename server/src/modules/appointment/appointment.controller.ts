@@ -11,16 +11,18 @@ import {
   UseGuards,
   Delete,
 } from '@nestjs/common';
-import { FirebaseAuthGuard } from 'src/guards/firebase-auth.guard';
 import { auth } from 'firebase-admin';
 import { PatientAppointmentResponse } from 'src/dto/appointment/patient-appointment-response.dto';
 import { DoctorAppointmentResponse } from 'src/dto/appointment/doctor-appointment-response.dto';
+import { RoleAuthGuard } from 'src/guards/role-auth.guard';
+import { Role } from 'src/decorators/role.decorator';
+import { Roles } from 'src/enum/roles.enum';
 
+@UseGuards(RoleAuthGuard)
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @UseGuards(FirebaseAuthGuard)
   @Get('patient')
   public async getPatientAppointments(
     @AuthUser() firebaseUser: auth.UserRecord,
@@ -28,7 +30,6 @@ export class AppointmentController {
     return await this.appointmentService.getPatientAppointments(firebaseUser);
   }
 
-  @UseGuards(FirebaseAuthGuard)
   @Get('doctor')
   public async getDoctorAppointments(
     @AuthUser() firebaseUser: auth.UserRecord,
@@ -36,7 +37,6 @@ export class AppointmentController {
     return await this.appointmentService.getDoctorAppointments(firebaseUser);
   }
 
-  @UseGuards(FirebaseAuthGuard)
   @Post()
   public async createNewAppointment(
     @AuthUser() firebaseUser: auth.UserRecord,
@@ -48,7 +48,12 @@ export class AppointmentController {
     );
   }
 
-  @UseGuards(FirebaseAuthGuard)
+  @Post('/roles')
+  @Role(Roles.Main)
+  public async testRoles(): Promise<string> {
+    return 'ok';
+  }
+
   @Put()
   public async updateAppointment(
     @Body() appointment: Appointment,
@@ -56,7 +61,6 @@ export class AppointmentController {
     return await this.appointmentService.updateAppointment(appointment);
   }
 
-  @UseGuards(FirebaseAuthGuard)
   @Delete()
   public async deleteAppointment(
     @Body() appointment: Appointment,
