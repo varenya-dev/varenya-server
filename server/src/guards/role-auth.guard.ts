@@ -37,13 +37,19 @@ export class RoleAuthGuard implements CanActivate {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
 
+      let databaseUser;
+
       const firebaseUser = await this.firebaseService.firebaseAuth.getUser(
         decodedToken.uid,
       );
 
-      const databaseUser = await this.userService.findOneUserByFirebaseId(
-        firebaseUser.uid,
-      );
+      try {
+        databaseUser = await this.userService.findOneUserByFirebaseId(
+          firebaseUser.uid,
+        );
+      } catch (error) {
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
 
       const loggedInUser = new LoggedInUser(firebaseUser, databaseUser);
 

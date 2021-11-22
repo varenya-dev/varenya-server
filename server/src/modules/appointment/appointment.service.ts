@@ -1,10 +1,11 @@
+import { User } from 'src/models/user.model';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
 import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
 import { FirebaseService } from './../firebase/firebase.service';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
 import { Repository } from 'typeorm';
@@ -113,10 +114,14 @@ export class AppointmentService {
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
     const patientUser = loggedInUser.databaseUser;
-
-    const doctorUser = await this.userService.findOneUserByFirebaseId(
-      createAppointmentDto.doctorId,
-    );
+    let doctorUser: User;
+    try {
+      doctorUser = await this.userService.findOneUserByFirebaseId(
+        createAppointmentDto.doctorId,
+      );
+    } catch (error) {
+      throw new HttpException('Doctor does not exist', HttpStatus.NOT_FOUND);
+    }
 
     const appointmentDetails = new Appointment(patientUser, doctorUser);
 
@@ -130,12 +135,21 @@ export class AppointmentService {
   public async updateAppointment(
     updatedAppointment: Appointment,
   ): Promise<Appointment> {
-    const appointment = await this.appointmentRepository.findOneOrFail({
-      where: {
-        id: updatedAppointment.id,
-      },
-      relations: ['patientUser'],
-    });
+    let appointment: Appointment;
+
+    try {
+      appointment = await this.appointmentRepository.findOneOrFail({
+        where: {
+          id: updatedAppointment.id,
+        },
+        relations: ['patientUser'],
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Appointment does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     await this.notificationService.handleAppointmentUpdateNotification(
       appointment.patientUser.firebaseId,
@@ -147,12 +161,20 @@ export class AppointmentService {
   public async deleteAppointment(
     appointment: Appointment,
   ): Promise<Appointment> {
-    const appointmentDb = await this.appointmentRepository.findOne({
-      where: {
-        id: appointment.id,
-      },
-      relations: ['patientUser', 'doctorUser'],
-    });
+    let appointmentDb: Appointment;
+    try {
+      appointmentDb = await this.appointmentRepository.findOneOrFail({
+        where: {
+          id: appointment.id,
+        },
+        relations: ['patientUser', 'doctorUser'],
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Appointment does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     await this.notificationService.handleAppointmentDeleteNotification([
       appointmentDb.doctorUser.firebaseId,
