@@ -1,3 +1,4 @@
+import { auth } from 'firebase-admin';
 import { LoggedInUser } from './../dto/logged-in-user.dto';
 import { FirebaseService } from '../modules/firebase/firebase.service';
 import { UserService } from 'src/modules/user/user.service';
@@ -24,9 +25,17 @@ export class RoleAuthGuard implements CanActivate {
       request.headers.authorization &&
       request.headers.authorization.split(' ')[0] === 'Bearer'
     ) {
-      const authToken = request.headers.authorization.split(' ')[1];
-      const decodedToken =
-        await this.firebaseService.firebaseAuth.verifyIdToken(authToken);
+      let decodedToken: auth.DecodedIdToken;
+
+      try {
+        const authToken = request.headers.authorization.split(' ')[1];
+        decodedToken = await this.firebaseService.firebaseAuth.verifyIdToken(
+          authToken,
+        );
+      } catch (error) {
+        console.log(error.message);
+        throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+      }
 
       const firebaseUser = await this.firebaseService.firebaseAuth.getUser(
         decodedToken.uid,

@@ -130,7 +130,7 @@ export class AppointmentService {
   public async updateAppointment(
     updatedAppointment: Appointment,
   ): Promise<Appointment> {
-    const appointment = await this.appointmentRepository.findOne({
+    const appointment = await this.appointmentRepository.findOneOrFail({
       where: {
         id: updatedAppointment.id,
       },
