@@ -1,6 +1,5 @@
 import { LoggedInUser } from './../dto/logged-in-user.dto';
 import { FirebaseService } from '../modules/firebase/firebase.service';
-import { auth } from 'firebase-admin';
 import { UserService } from 'src/modules/user/user.service';
 import {
   CanActivate,
