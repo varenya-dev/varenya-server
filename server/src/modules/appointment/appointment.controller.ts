@@ -52,7 +52,7 @@ export class AppointmentController {
   }
 
   @Put()
-  @Role(Roles.Professional)
+  @Role(Roles.Main, Roles.Professional)
   public async updateAppointment(
     @Body() appointment: Appointment,
   ): Promise<Appointment> {
