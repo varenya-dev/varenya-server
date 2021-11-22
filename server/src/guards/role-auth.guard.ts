@@ -1,3 +1,4 @@
+import { LoggedInUser } from './../dto/logged-in-user.dto';
 import { FirebaseService } from '../modules/firebase/firebase.service';
 import { auth } from 'firebase-admin';
 import { UserService } from 'src/modules/user/user.service';
@@ -32,7 +33,13 @@ export class RoleAuthGuard implements CanActivate {
         decodedToken.uid,
       );
 
-      request.user = firebaseUser;
+      const databaseUser = await this.userService.findOneUserByFirebaseId(
+        firebaseUser.uid,
+      );
+
+      const loggedInUser = new LoggedInUser(firebaseUser, databaseUser);
+
+      request.user = loggedInUser;
       return true;
     } else {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -43,13 +50,9 @@ export class RoleAuthGuard implements CanActivate {
     const checkAuth = await this.validateAuthenticationHeader(request);
 
     if (checkAuth) {
-      const user: auth.UserRecord = request.user;
+      const user: LoggedInUser = request.user;
 
-      const databaseUser = await this.userService.findOneUserByFirebaseId(
-        user.uid,
-      );
-
-      if (roles.includes(databaseUser.role)) {
+      if (roles.includes(user.databaseUser.role)) {
         return true;
       } else {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);

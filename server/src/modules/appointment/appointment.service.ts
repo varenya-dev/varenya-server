@@ -1,3 +1,4 @@
+import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
@@ -8,7 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
-import { auth } from 'firebase-admin';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
 
@@ -24,11 +24,9 @@ export class AppointmentService {
   ) {}
 
   public async getPatientAppointments(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
   ): Promise<PatientAppointmentResponse[]> {
-    const patientUser = await this.userService.findOneUserByFirebaseId(
-      loggedInUser.uid,
-    );
+    const patientUser = loggedInUser.databaseUser;
 
     const patientAppointments = await this.appointmentRepository.find({
       where: {
@@ -51,11 +49,9 @@ export class AppointmentService {
   }
 
   public async getDoctorAppointments(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
   ): Promise<DoctorAppointmentResponse[]> {
-    const doctorUser = await this.userService.findOneUserByFirebaseId(
-      loggedInUser.uid,
-    );
+    const doctorUser = loggedInUser.databaseUser;
 
     const doctorAppointments = await this.appointmentRepository.find({
       where: {
@@ -113,12 +109,10 @@ export class AppointmentService {
   }
 
   public async createNewAppointment(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
-    const patientUser = await this.userService.findOneUserByFirebaseId(
-      loggedInUser.uid,
-    );
+    const patientUser = loggedInUser.databaseUser;
 
     const doctorUser = await this.userService.findOneUserByFirebaseId(
       createAppointmentDto.doctorId,
