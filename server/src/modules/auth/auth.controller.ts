@@ -1,34 +1,24 @@
 import { AuthService } from './auth.service';
 import { FirebaseAuthGuard } from './../../guards/firebase-auth.guard';
-import { Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthUser } from 'src/decorators/auth-user.decorator';
 import { auth } from 'firebase-admin';
 import { User } from 'src/models/user.model';
-import { Roles } from 'src/enum/roles.enum';
+import { NewUserDto } from 'src/dto/auth/new-user.dto';
 
+@UseGuards(FirebaseAuthGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(FirebaseAuthGuard)
-  @Post('roles/main')
-  public async addRoleAndSaveToDatabaseMain(
+  @Post('register')
+  public async addRoleAndSaveToDatabase(
     @AuthUser() firebaseUser: auth.UserRecord,
+    @Body() newUserDto: NewUserDto,
   ): Promise<User> {
     return await this.authService.addRoleAndSaveToDatabase(
       firebaseUser,
-      Roles.Main,
-    );
-  }
-
-  @UseGuards(FirebaseAuthGuard)
-  @Post('roles/professional')
-  public async addRoleAndSaveToDatabaseProfessional(
-    @AuthUser() firebaseUser: auth.UserRecord,
-  ): Promise<User> {
-    return await this.authService.addRoleAndSaveToDatabase(
-      firebaseUser,
-      Roles.Professional,
+      newUserDto.role,
     );
   }
 }

@@ -11,7 +11,7 @@ export class UserService {
   ) {}
 
   public async findOneUserByFirebaseId(firebaseId: string): Promise<User> {
-    return await this.userRepository.findOne({
+    return await this.userRepository.findOneOrFail({
       firebaseId,
     });
   }

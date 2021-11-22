@@ -1,5 +1,4 @@
 import { FirebaseService } from './../modules/firebase/firebase.service';
-import { Request } from 'express';
 import {
   CanActivate,
   ExecutionContext,
@@ -7,15 +6,10 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { UserService } from 'src/modules/user/user.service';
-import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 
 @Injectable()
 export class FirebaseAuthGuard implements CanActivate {
-  constructor(
-    private readonly userService: UserService,
-    private readonly firebaseService: FirebaseService,
-  ) {}
+  constructor(private readonly firebaseService: FirebaseService) {}
 
   private async validateAuthenticationHeader(request): Promise<boolean> {
     try {

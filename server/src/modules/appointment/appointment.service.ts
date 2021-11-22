@@ -1,15 +1,15 @@
+import { User } from 'src/models/user.model';
+import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
 import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
 import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
 import { FirebaseService } from './../firebase/firebase.service';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
-import { auth } from 'firebase-admin';
-import { Roles } from 'src/enum/roles.enum';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
 
@@ -25,17 +25,9 @@ export class AppointmentService {
   ) {}
 
   public async getPatientAppointments(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
   ): Promise<PatientAppointmentResponse[]> {
-    const patientUser = await this.userService.findOneUserByFirebaseId(
-      loggedInUser.uid,
-    );
-
-    if (patientUser.role !== Roles.Main) {
-      throw new ForbiddenException({
-        message: 'Forbidden to access this endpoint',
-      });
-    }
+    const patientUser = loggedInUser.databaseUser;
 
     const patientAppointments = await this.appointmentRepository.find({
       where: {
@@ -58,17 +50,9 @@ export class AppointmentService {
   }
 
   public async getDoctorAppointments(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
   ): Promise<DoctorAppointmentResponse[]> {
-    const doctorUser = await this.userService.findOneUserByFirebaseId(
-      loggedInUser.uid,
-    );
-
-    if (doctorUser.role !== Roles.Professional) {
-      throw new ForbiddenException({
-        message: 'Forbidden to access this endpoint',
-      });
-    }
+    const doctorUser = loggedInUser.databaseUser;
 
     const doctorAppointments = await this.appointmentRepository.find({
       where: {
@@ -126,22 +110,18 @@ export class AppointmentService {
   }
 
   public async createNewAppointment(
-    loggedInUser: auth.UserRecord,
+    loggedInUser: LoggedInUser,
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
-    const patientUser = await this.userService.findOneUserByFirebaseId(
-      loggedInUser.uid,
-    );
-
-    if (patientUser.role !== Roles.Main) {
-      throw new ForbiddenException({
-        message: 'Forbidden to access this endpoint',
-      });
+    const patientUser = loggedInUser.databaseUser;
+    let doctorUser: User;
+    try {
+      doctorUser = await this.userService.findOneUserByFirebaseId(
+        createAppointmentDto.doctorId,
+      );
+    } catch (error) {
+      throw new HttpException('Doctor does not exist', HttpStatus.NOT_FOUND);
     }
-
-    const doctorUser = await this.userService.findOneUserByFirebaseId(
-      createAppointmentDto.doctorId,
-    );
 
     const appointmentDetails = new Appointment(patientUser, doctorUser);
 
@@ -155,12 +135,21 @@ export class AppointmentService {
   public async updateAppointment(
     updatedAppointment: Appointment,
   ): Promise<Appointment> {
-    const appointment = await this.appointmentRepository.findOne({
-      where: {
-        id: updatedAppointment.id,
-      },
-      relations: ['patientUser'],
-    });
+    let appointment: Appointment;
+
+    try {
+      appointment = await this.appointmentRepository.findOneOrFail({
+        where: {
+          id: updatedAppointment.id,
+        },
+        relations: ['patientUser'],
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Appointment does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     await this.notificationService.handleAppointmentUpdateNotification(
       appointment.patientUser.firebaseId,
@@ -172,12 +161,20 @@ export class AppointmentService {
   public async deleteAppointment(
     appointment: Appointment,
   ): Promise<Appointment> {
-    const appointmentDb = await this.appointmentRepository.findOne({
-      where: {
-        id: appointment.id,
-      },
-      relations: ['patientUser', 'doctorUser'],
-    });
+    let appointmentDb: Appointment;
+    try {
+      appointmentDb = await this.appointmentRepository.findOneOrFail({
+        where: {
+          id: appointment.id,
+        },
+        relations: ['patientUser', 'doctorUser'],
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Appointment does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    }
 
     await this.notificationService.handleAppointmentDeleteNotification([
       appointmentDb.doctorUser.firebaseId,
