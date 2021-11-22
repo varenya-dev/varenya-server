@@ -3,13 +3,12 @@ import { CreateAppointmentDto } from './../../dto/appointment/create-appointment
 import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
 import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
 import { FirebaseService } from './../firebase/firebase.service';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { auth } from 'firebase-admin';
-import { Roles } from 'src/enum/roles.enum';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
 
@@ -30,12 +29,6 @@ export class AppointmentService {
     const patientUser = await this.userService.findOneUserByFirebaseId(
       loggedInUser.uid,
     );
-
-    if (patientUser.role !== Roles.Main) {
-      throw new ForbiddenException({
-        message: 'Forbidden to access this endpoint',
-      });
-    }
 
     const patientAppointments = await this.appointmentRepository.find({
       where: {
@@ -63,12 +56,6 @@ export class AppointmentService {
     const doctorUser = await this.userService.findOneUserByFirebaseId(
       loggedInUser.uid,
     );
-
-    if (doctorUser.role !== Roles.Professional) {
-      throw new ForbiddenException({
-        message: 'Forbidden to access this endpoint',
-      });
-    }
 
     const doctorAppointments = await this.appointmentRepository.find({
       where: {
@@ -132,12 +119,6 @@ export class AppointmentService {
     const patientUser = await this.userService.findOneUserByFirebaseId(
       loggedInUser.uid,
     );
-
-    if (patientUser.role !== Roles.Main) {
-      throw new ForbiddenException({
-        message: 'Forbidden to access this endpoint',
-      });
-    }
 
     const doctorUser = await this.userService.findOneUserByFirebaseId(
       createAppointmentDto.doctorId,

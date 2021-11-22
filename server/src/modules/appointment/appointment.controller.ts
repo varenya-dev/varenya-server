@@ -24,6 +24,7 @@ export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
   @Get('patient')
+  @Role(Roles.Main)
   public async getPatientAppointments(
     @AuthUser() firebaseUser: auth.UserRecord,
   ): Promise<PatientAppointmentResponse[]> {
@@ -31,6 +32,7 @@ export class AppointmentController {
   }
 
   @Get('doctor')
+  @Role(Roles.Professional)
   public async getDoctorAppointments(
     @AuthUser() firebaseUser: auth.UserRecord,
   ): Promise<DoctorAppointmentResponse[]> {
@@ -38,6 +40,7 @@ export class AppointmentController {
   }
 
   @Post()
+  @Role(Roles.Main)
   public async createNewAppointment(
     @AuthUser() firebaseUser: auth.UserRecord,
     @Body() createAppointmentDto: CreateAppointmentDto,
@@ -48,13 +51,8 @@ export class AppointmentController {
     );
   }
 
-  @Post('/roles')
-  @Role(Roles.Main)
-  public async testRoles(): Promise<string> {
-    return 'ok';
-  }
-
   @Put()
+  @Role(Roles.Main, Roles.Professional)
   public async updateAppointment(
     @Body() appointment: Appointment,
   ): Promise<Appointment> {
@@ -62,6 +60,7 @@ export class AppointmentController {
   }
 
   @Delete()
+  @Role(Roles.Main, Roles.Professional)
   public async deleteAppointment(
     @Body() appointment: Appointment,
   ): Promise<Appointment> {
