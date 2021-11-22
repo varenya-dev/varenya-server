@@ -2,7 +2,6 @@ import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { RoleAuthGuard } from 'src/guards/role-auth.guard';
 import { ResponseNotificationDto } from './../../dto/notification/response-notification.dto';
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
-import { auth } from 'firebase-admin';
 import { AuthUser } from '../../decorators/auth-user.decorator';
 import { NotificationService } from './notification.service';
 import { Controller, UseGuards, Post, Body } from '@nestjs/common';

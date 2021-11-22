@@ -6,11 +6,11 @@ import { auth } from 'firebase-admin';
 import { User } from 'src/models/user.model';
 import { Roles } from 'src/enum/roles.enum';
 
+@UseGuards(FirebaseAuthGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(FirebaseAuthGuard)
   @Post('roles/main')
   public async addRoleAndSaveToDatabaseMain(
     @AuthUser() firebaseUser: auth.UserRecord,
@@ -21,7 +21,6 @@ export class AuthController {
     );
   }
 
-  @UseGuards(FirebaseAuthGuard)
   @Post('roles/professional')
   public async addRoleAndSaveToDatabaseProfessional(
     @AuthUser() firebaseUser: auth.UserRecord,

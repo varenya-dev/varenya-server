@@ -3,7 +3,6 @@ import { ResponseNotificationDto } from './../../dto/notification/response-notif
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Injectable, Body } from '@nestjs/common';
-import { auth } from 'firebase-admin';
 
 @Injectable()
 export class NotificationService {
