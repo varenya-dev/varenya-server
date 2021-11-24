@@ -14,6 +14,14 @@ import { FilterDoctorDto } from 'src/dto/doctor/filter-doctor.dto';
 export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
+  @Get('identity')
+  @Role(Roles.Professional)
+  public async getLoggedInDoctor(
+    @AuthUser() loggedInUser: LoggedInUser,
+  ): Promise<Doctor> {
+    return await this.doctorService.getLoggedInDoctor(loggedInUser);
+  }
+
   @Get('filter')
   @Role(Roles.Main)
   public async filterDoctor(
