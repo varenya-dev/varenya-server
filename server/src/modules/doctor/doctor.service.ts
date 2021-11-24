@@ -9,7 +9,7 @@ import { Specialization } from 'src/models/specialization.model';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { User } from 'src/models/user.model';
-import { intersectionBy, flatten, uniq } from 'lodash';
+import { intersectionBy, flatten, uniq, uniqBy } from 'lodash';
 
 @Injectable()
 export class DoctorService {
@@ -53,6 +53,10 @@ export class DoctorService {
   public async filterDoctor(
     filterDoctorDto: FilterDoctorDto,
   ): Promise<Doctor[]> {
+    filterDoctorDto.specializations = filterDoctorDto.specializations.filter(
+      (s) => s.length !== 0,
+    );
+
     if (
       filterDoctorDto.jobTitle === 'EMPTY' &&
       filterDoctorDto.specializations.length === 0
@@ -107,7 +111,10 @@ export class DoctorService {
       },
     );
 
-    return flatten(specializationsWithDoctors.map((s) => s.doctors));
+    return uniqBy(
+      flatten(specializationsWithDoctors.map((s) => s.doctors)),
+      'id',
+    );
   }
 
   public async createPlaceholder(loggedInUser: LoggedInUser): Promise<Doctor> {
