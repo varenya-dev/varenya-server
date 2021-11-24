@@ -1,4 +1,11 @@
-import { IsDecimal, IsNotEmpty, IsUrl, MinLength } from 'class-validator';
+import {
+  IsCurrency,
+  IsDecimal,
+  IsNotEmpty,
+  IsNumber,
+  IsUrl,
+  MinLength,
+} from 'class-validator';
 
 export class NewDoctorDto {
   @IsNotEmpty()
@@ -15,7 +22,7 @@ export class NewDoctorDto {
   public clinicAddress: string;
 
   @IsNotEmpty()
-  @IsDecimal()
+  @IsNumber()
   public cost: number;
 
   @MinLength(1, { each: true })

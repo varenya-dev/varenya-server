@@ -47,10 +47,6 @@ export class DoctorService {
 
     const savedDoctor = await this.doctorRepository.save(newDoctor);
 
-    correspondingUser.doctor = savedDoctor;
-
-    await this.userService.saveUser(correspondingUser);
-
     return savedDoctor;
   }
 }
