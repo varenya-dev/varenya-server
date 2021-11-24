@@ -67,4 +67,47 @@ export class DoctorService {
 
     return savedDoctor;
   }
+
+  public async updateDoctor(
+    loggedInUser: LoggedInUser,
+    updatedDoctorDto: NewOrUpdatedDoctor,
+  ): Promise<Doctor> {
+    const dbDoctor = await this.doctorRepository.findOne({
+      user: loggedInUser.databaseUser,
+    });
+
+    if (dbDoctor == null) {
+      throw new HttpException('Doctor does not exists.', HttpStatus.NOT_FOUND);
+    }
+
+    const specializations: Specialization[] = await Promise.all(
+      updatedDoctorDto.specializations.map(async (specialization) => {
+        const formattedSpecialization = specialization.toUpperCase();
+
+        const dbSpecialization = await this.specializationRepository.findOne({
+          specialization: formattedSpecialization,
+        });
+
+        if (dbSpecialization != null) {
+          return dbSpecialization;
+        } else {
+          const newSpecialization: Specialization = new Specialization();
+          newSpecialization.specialization = formattedSpecialization;
+
+          return await this.specializationRepository.save(newSpecialization);
+        }
+      }),
+    );
+
+    dbDoctor.fullName = updatedDoctorDto.fullName;
+    dbDoctor.imageUrl = updatedDoctorDto.imageUrl;
+    dbDoctor.jobTitle = updatedDoctorDto.jobTitle;
+    dbDoctor.clinicAddress = updatedDoctorDto.clinicAddress;
+    dbDoctor.cost = updatedDoctorDto.cost;
+    dbDoctor.specializations = specializations;
+
+    const updatedDoctor = await this.doctorRepository.save(dbDoctor);
+
+    return updatedDoctor;
+  }
 }
