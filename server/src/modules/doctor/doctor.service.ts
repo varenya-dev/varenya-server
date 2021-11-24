@@ -9,7 +9,7 @@ import { Specialization } from 'src/models/specialization.model';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { User } from 'src/models/user.model';
-import { intersectionBy, flatten } from 'lodash';
+import { intersectionBy, flatten, uniq, uniqBy } from 'lodash';
 
 @Injectable()
 export class DoctorService {
@@ -19,11 +19,22 @@ export class DoctorService {
     @InjectRepository(Specialization)
     private readonly specializationRepository: Repository<Specialization>,
     private readonly userService: UserService,
-    private readonly firebaseService: FirebaseService,
   ) {}
 
   public async getSpecializations(): Promise<Specialization[]> {
     return await this.specializationRepository.find();
+  }
+
+  public async getJobTitles(): Promise<string[]> {
+    const jobTitles = (
+      await this.doctorRepository.find({
+        select: ['jobTitle'],
+      })
+    )
+      .map((j) => j.jobTitle)
+      .filter((j) => j !== 'Enter Your Job Title Here.');
+
+    return uniq(jobTitles);
   }
 
   public async getLoggedInDoctor(loggedInUser: LoggedInUser): Promise<Doctor> {
@@ -42,6 +53,10 @@ export class DoctorService {
   public async filterDoctor(
     filterDoctorDto: FilterDoctorDto,
   ): Promise<Doctor[]> {
+    filterDoctorDto.specializations = filterDoctorDto.specializations.filter(
+      (s) => s.length !== 0,
+    );
+
     if (
       filterDoctorDto.jobTitle === 'EMPTY' &&
       filterDoctorDto.specializations.length === 0
@@ -96,7 +111,10 @@ export class DoctorService {
       },
     );
 
-    return flatten(specializationsWithDoctors.map((s) => s.doctors));
+    return uniqBy(
+      flatten(specializationsWithDoctors.map((s) => s.doctors)),
+      'id',
+    );
   }
 
   public async createPlaceholder(loggedInUser: LoggedInUser): Promise<Doctor> {
@@ -158,7 +176,7 @@ export class DoctorService {
     const newDoctor: Doctor = new Doctor();
     newDoctor.fullName = newDoctorDto.fullName;
     newDoctor.imageUrl = newDoctorDto.imageUrl;
-    newDoctor.jobTitle = newDoctorDto.jobTitle;
+    newDoctor.jobTitle = newDoctorDto.jobTitle.toUpperCase();
     newDoctor.clinicAddress = newDoctorDto.clinicAddress;
     newDoctor.cost = newDoctorDto.cost;
     newDoctor.specializations = specializations;
@@ -202,7 +220,7 @@ export class DoctorService {
 
     dbDoctor.fullName = updatedDoctorDto.fullName;
     dbDoctor.imageUrl = updatedDoctorDto.imageUrl;
-    dbDoctor.jobTitle = updatedDoctorDto.jobTitle;
+    dbDoctor.jobTitle = updatedDoctorDto.jobTitle.toUpperCase();
     dbDoctor.clinicAddress = updatedDoctorDto.clinicAddress;
     dbDoctor.cost = updatedDoctorDto.cost;
     dbDoctor.specializations = specializations;
