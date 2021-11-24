@@ -1,3 +1,4 @@
+import { Specialization } from 'src/models/specialization.model';
 import { AuthUser } from './../../decorators/auth-user.decorator';
 import { DoctorService } from './doctor.service';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
@@ -13,6 +14,12 @@ import { FilterDoctorDto } from 'src/dto/doctor/filter-doctor.dto';
 @UseGuards(RoleAuthGuard)
 export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
+
+  @Get('specializations')
+  @Role(Roles.Professional, Roles.Main)
+  public async getSpecializations(): Promise<Specialization[]> {
+    return await this.doctorService.getSpecializations();
+  }
 
   @Get('identity')
   @Role(Roles.Professional)
