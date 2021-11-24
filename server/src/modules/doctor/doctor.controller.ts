@@ -1,6 +1,6 @@
 import { AuthUser } from './../../decorators/auth-user.decorator';
 import { DoctorService } from './doctor.service';
-import { NewDoctorDto } from 'src/dto/doctor/new-doctor.dto';
+import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { RoleAuthGuard } from './../../guards/role-auth.guard';
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { Role } from 'src/decorators/role.decorator';
@@ -17,7 +17,7 @@ export class DoctorController {
   @Role(Roles.Professional)
   public async createDoctor(
     @AuthUser() loggedInUser: LoggedInUser,
-    @Body() newDoctorDto: NewDoctorDto,
+    @Body() newDoctorDto: NewOrUpdatedDoctor,
   ): Promise<Doctor> {
     return await this.doctorService.createDoctor(loggedInUser, newDoctorDto);
   }

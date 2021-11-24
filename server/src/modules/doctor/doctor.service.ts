@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Specialization } from 'src/models/specialization.model';
-import { NewDoctorDto } from 'src/dto/doctor/new-doctor.dto';
+import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { User } from 'src/models/user.model';
 
@@ -20,7 +20,7 @@ export class DoctorService {
 
   public async createDoctor(
     loggedInUser: LoggedInUser,
-    newDoctorDto: NewDoctorDto,
+    newDoctorDto: NewOrUpdatedDoctor,
   ): Promise<Doctor> {
     const checkDoctor = await this.doctorRepository.findOne({
       user: loggedInUser.databaseUser,

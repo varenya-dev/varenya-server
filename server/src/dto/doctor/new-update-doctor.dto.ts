@@ -1,13 +1,6 @@
-import {
-  IsCurrency,
-  IsDecimal,
-  IsNotEmpty,
-  IsNumber,
-  IsUrl,
-  MinLength,
-} from 'class-validator';
+import { IsNotEmpty, IsNumber, IsUrl, MinLength } from 'class-validator';
 
-export class NewDoctorDto {
+export class NewOrUpdatedDoctor {
   @IsNotEmpty()
   public fullName: string;
 
