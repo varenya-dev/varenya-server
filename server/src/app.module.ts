@@ -1,3 +1,4 @@
+import { Specialization } from './models/specialization.model';
 import { AppointmentModule } from './modules/appointment/appointment.module';
 import { Appointment } from './models/appointment.model';
 import { NotificationModule } from './modules/notifications/notification.module';
@@ -19,7 +20,7 @@ import { User } from './models/user.model';
       database: process.env.DATABASE_NAME,
       synchronize: true,
       logging: true,
-      entities: [User, Appointment],
+      entities: [User, Appointment, Specialization],
     }),
     FirebaseModule,
     UserModule,
