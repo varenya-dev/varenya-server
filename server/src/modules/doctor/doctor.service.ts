@@ -30,7 +30,9 @@ export class DoctorService {
       await this.doctorRepository.find({
         select: ['jobTitle'],
       })
-    ).map((j) => j.jobTitle);
+    )
+      .map((j) => j.jobTitle)
+      .filter((j) => j !== 'Enter Your Job Title Here.');
 
     return uniq(jobTitles);
   }
