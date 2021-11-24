@@ -8,6 +8,7 @@ import { Specialization } from 'src/models/specialization.model';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { User } from 'src/models/user.model';
+import { intersectionBy, flatten } from 'lodash';
 
 @Injectable()
 export class DoctorService {
@@ -31,30 +32,52 @@ export class DoctorService {
       filterDoctorDto.jobTitle !== 'EMPTY' &&
       filterDoctorDto.specializations.length === 0
     ) {
-      return await this.doctorRepository.find({
-        where: {
-          jobTitle: Equal(filterDoctorDto.jobTitle),
-        },
-      });
+      return await this.getDoctorsByJobTitle(filterDoctorDto.jobTitle);
     } else if (
       filterDoctorDto.jobTitle !== 'EMPTY' &&
       filterDoctorDto.specializations.length > 0
     ) {
-      const specializations = await this.specializationRepository.find({
-        where: {
-          specialization: In(filterDoctorDto.specializations),
-        },
-      });
+      const jobTitleDocs = await this.getDoctorsByJobTitle(
+        filterDoctorDto.jobTitle,
+      );
+      const specializationDocs = await this.getDoctorsBySpecialization(
+        filterDoctorDto.specializations,
+      );
 
-      return await this.doctorRepository.find({
-        where: {
-          jobTitle: Equal(filterDoctorDto.jobTitle),
-          specializations: Any(specializations),
-        },
-      });
+      return intersectionBy(jobTitleDocs, specializationDocs, 'id');
+    } else if (
+      filterDoctorDto.jobTitle === 'EMPTY' &&
+      filterDoctorDto.specializations.length > 0
+    ) {
+      return await this.getDoctorsBySpecialization(
+        filterDoctorDto.specializations,
+      );
     } else {
       throw new HttpException('Invalid Filters', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  private async getDoctorsByJobTitle(jobTitle: string): Promise<Doctor[]> {
+    return await this.doctorRepository.find({
+      where: {
+        jobTitle: Equal(jobTitle),
+      },
+    });
+  }
+
+  private async getDoctorsBySpecialization(
+    specializations: string[],
+  ): Promise<Doctor[]> {
+    const specializationsWithDoctors = await this.specializationRepository.find(
+      {
+        where: {
+          specialization: In(specializations),
+        },
+        relations: ['doctors'],
+      },
+    );
+
+    return flatten(specializationsWithDoctors.map((s) => s.doctors));
   }
 
   public async createDoctor(

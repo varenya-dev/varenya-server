@@ -18,8 +18,11 @@ export class Specialization {
   public specialization: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  public createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  public updatedAt: Date;
+
+  @ManyToMany(() => Doctor, (doctor) => doctor.specializations)
+  public doctors: Doctor[];
 }

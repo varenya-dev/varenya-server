@@ -30,7 +30,11 @@ export class Doctor {
   @Column()
   public cost: number;
 
-  @ManyToMany(() => Specialization)
+  @ManyToMany(
+    () => Specialization,
+    (specialization) => specialization.doctors,
+    { eager: true },
+  )
   @JoinTable()
   public specializations: Specialization[];
 

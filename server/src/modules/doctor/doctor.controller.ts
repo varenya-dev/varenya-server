@@ -18,10 +18,8 @@ export class DoctorController {
   @Role(Roles.Main)
   public async filterDoctor(
     @Body() filterDoctorDto: FilterDoctorDto,
-  ): Promise<string> {
-    console.log(filterDoctorDto);
-
-    return '';
+  ): Promise<Doctor[]> {
+    return await this.doctorService.filterDoctor(filterDoctorDto);
   }
 
   @Post()
