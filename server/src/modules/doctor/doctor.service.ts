@@ -20,6 +20,10 @@ export class DoctorService {
     private readonly userService: UserService,
   ) {}
 
+  public async getSpecializations(): Promise<Specialization[]> {
+    return await this.specializationRepository.find();
+  }
+
   public async getLoggedInDoctor(loggedInUser: LoggedInUser): Promise<Doctor> {
     try {
       return await this.doctorRepository.findOneOrFail({
