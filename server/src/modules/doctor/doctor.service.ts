@@ -20,6 +20,19 @@ export class DoctorService {
     private readonly userService: UserService,
   ) {}
 
+  public async getLoggedInDoctor(loggedInUser: LoggedInUser): Promise<Doctor> {
+    try {
+      return await this.doctorRepository.findOneOrFail({
+        user: loggedInUser.databaseUser,
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Doctor details do not exist for this account. Please create one.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
   public async filterDoctor(
     filterDoctorDto: FilterDoctorDto,
   ): Promise<Doctor[]> {
