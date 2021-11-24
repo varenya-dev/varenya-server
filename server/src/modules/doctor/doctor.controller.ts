@@ -15,10 +15,16 @@ import { FilterDoctorDto } from 'src/dto/doctor/filter-doctor.dto';
 export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
-  @Get('specializations')
+  @Get('specialization')
   @Role(Roles.Professional, Roles.Main)
   public async getSpecializations(): Promise<Specialization[]> {
     return await this.doctorService.getSpecializations();
+  }
+
+  @Get('title')
+  @Role(Roles.Professional, Roles.Main)
+  public async getJobTitles(): Promise<string[]> {
+    return await this.doctorService.getJobTitles();
   }
 
   @Get('identity')

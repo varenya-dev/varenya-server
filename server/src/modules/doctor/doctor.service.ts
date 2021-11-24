@@ -9,7 +9,7 @@ import { Specialization } from 'src/models/specialization.model';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { User } from 'src/models/user.model';
-import { intersectionBy, flatten } from 'lodash';
+import { intersectionBy, flatten, uniq } from 'lodash';
 
 @Injectable()
 export class DoctorService {
@@ -19,11 +19,20 @@ export class DoctorService {
     @InjectRepository(Specialization)
     private readonly specializationRepository: Repository<Specialization>,
     private readonly userService: UserService,
-    private readonly firebaseService: FirebaseService,
   ) {}
 
   public async getSpecializations(): Promise<Specialization[]> {
     return await this.specializationRepository.find();
+  }
+
+  public async getJobTitles(): Promise<string[]> {
+    const jobTitles = (
+      await this.doctorRepository.find({
+        select: ['jobTitle'],
+      })
+    ).map((j) => j.jobTitle);
+
+    return uniq(jobTitles);
   }
 
   public async getLoggedInDoctor(loggedInUser: LoggedInUser): Promise<Doctor> {
