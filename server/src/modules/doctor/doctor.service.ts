@@ -169,7 +169,7 @@ export class DoctorService {
     const newDoctor: Doctor = new Doctor();
     newDoctor.fullName = newDoctorDto.fullName;
     newDoctor.imageUrl = newDoctorDto.imageUrl;
-    newDoctor.jobTitle = newDoctorDto.jobTitle;
+    newDoctor.jobTitle = newDoctorDto.jobTitle.toUpperCase();
     newDoctor.clinicAddress = newDoctorDto.clinicAddress;
     newDoctor.cost = newDoctorDto.cost;
     newDoctor.specializations = specializations;
@@ -213,7 +213,7 @@ export class DoctorService {
 
     dbDoctor.fullName = updatedDoctorDto.fullName;
     dbDoctor.imageUrl = updatedDoctorDto.imageUrl;
-    dbDoctor.jobTitle = updatedDoctorDto.jobTitle;
+    dbDoctor.jobTitle = updatedDoctorDto.jobTitle.toUpperCase();
     dbDoctor.clinicAddress = updatedDoctorDto.clinicAddress;
     dbDoctor.cost = updatedDoctorDto.cost;
     dbDoctor.specializations = specializations;
