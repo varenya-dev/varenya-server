@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsUrl, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsUrl,
+  MinLength,
+  IsArray,
+} from 'class-validator';
 
 export class NewOrUpdatedDoctor {
   @IsNotEmpty()
@@ -18,6 +24,6 @@ export class NewOrUpdatedDoctor {
   @IsNumber()
   public cost: number;
 
-  @MinLength(1, { each: true })
+  @IsArray()
   public specializations: string[];
 }

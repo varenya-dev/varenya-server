@@ -18,7 +18,7 @@ export class Doctor {
   @Column()
   public fullName: string;
 
-  @Column()
+  @Column({ nullable: true })
   public imageUrl: string;
 
   @Column()

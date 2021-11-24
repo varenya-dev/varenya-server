@@ -1,3 +1,4 @@
+import { Specialization } from 'src/models/specialization.model';
 import { AuthUser } from './../../decorators/auth-user.decorator';
 import { DoctorService } from './doctor.service';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
@@ -14,12 +15,34 @@ import { FilterDoctorDto } from 'src/dto/doctor/filter-doctor.dto';
 export class DoctorController {
   constructor(private readonly doctorService: DoctorService) {}
 
+  @Get('specializations')
+  @Role(Roles.Professional, Roles.Main)
+  public async getSpecializations(): Promise<Specialization[]> {
+    return await this.doctorService.getSpecializations();
+  }
+
+  @Get('identity')
+  @Role(Roles.Professional)
+  public async getLoggedInDoctor(
+    @AuthUser() loggedInUser: LoggedInUser,
+  ): Promise<Doctor> {
+    return await this.doctorService.getLoggedInDoctor(loggedInUser);
+  }
+
   @Get('filter')
   @Role(Roles.Main)
   public async filterDoctor(
     @Body() filterDoctorDto: FilterDoctorDto,
   ): Promise<Doctor[]> {
     return await this.doctorService.filterDoctor(filterDoctorDto);
+  }
+
+  @Post('placeholder')
+  @Role(Roles.Professional)
+  public async createPlaceholder(
+    @AuthUser() loggedInUser: LoggedInUser,
+  ): Promise<Doctor> {
+    return await this.doctorService.createPlaceholder(loggedInUser);
   }
 
   @Post()
