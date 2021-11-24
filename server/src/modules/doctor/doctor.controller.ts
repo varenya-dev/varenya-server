@@ -37,6 +37,14 @@ export class DoctorController {
     return await this.doctorService.filterDoctor(filterDoctorDto);
   }
 
+  @Post('placeholder')
+  @Role(Roles.Professional)
+  public async createPlaceholder(
+    @AuthUser() loggedInUser: LoggedInUser,
+  ): Promise<Doctor> {
+    return await this.doctorService.createPlaceholder(loggedInUser);
+  }
+
   @Post()
   @Role(Roles.Professional)
   public async createDoctor(

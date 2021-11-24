@@ -1,3 +1,4 @@
+import { FirebaseService } from './../firebase/firebase.service';
 import { FilterDoctorDto } from 'src/dto/doctor/filter-doctor.dto';
 import { UserService } from './../user/user.service';
 import { Doctor } from './../../models/doctor.model';
@@ -18,6 +19,7 @@ export class DoctorService {
     @InjectRepository(Specialization)
     private readonly specializationRepository: Repository<Specialization>,
     private readonly userService: UserService,
+    private readonly firebaseService: FirebaseService,
   ) {}
 
   public async getSpecializations(): Promise<Specialization[]> {
@@ -95,6 +97,26 @@ export class DoctorService {
     );
 
     return flatten(specializationsWithDoctors.map((s) => s.doctors));
+  }
+
+  public async createPlaceholder(loggedInUser: LoggedInUser): Promise<Doctor> {
+    const correspondingUser: User =
+      await this.userService.findOneUserByFirebaseId(
+        loggedInUser.firebaseUser.uid,
+      );
+
+    const newDoctor: Doctor = new Doctor();
+    newDoctor.fullName = loggedInUser.firebaseUser.displayName;
+    newDoctor.imageUrl = loggedInUser.firebaseUser.photoURL;
+    newDoctor.jobTitle = 'Enter Your Job Title Here.';
+    newDoctor.clinicAddress = 'Enter Your Address Here.';
+    newDoctor.cost = 0;
+    newDoctor.specializations = [];
+    newDoctor.user = correspondingUser;
+
+    const savedDoctor = await this.doctorRepository.save(newDoctor);
+
+    return savedDoctor;
   }
 
   public async createDoctor(
