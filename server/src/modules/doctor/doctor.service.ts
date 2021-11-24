@@ -110,4 +110,14 @@ export class DoctorService {
 
     return updatedDoctor;
   }
+
+  public async deleteDoctor(user: User): Promise<void> {
+    const dbDoctor = await this.doctorRepository.findOne({
+      user: user,
+    });
+
+    if (dbDoctor != null) {
+      await this.doctorRepository.remove(dbDoctor);
+    }
+  }
 }
