@@ -8,6 +8,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './models/user.model';
+import { Doctor } from './models/doctor.model';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { User } from './models/user.model';
       database: process.env.DATABASE_NAME,
       synchronize: true,
       logging: true,
-      entities: [User, Appointment, Specialization],
+      entities: [User, Appointment, Specialization, Doctor],
     }),
     FirebaseModule,
     UserModule,

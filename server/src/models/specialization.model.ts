@@ -1,7 +1,10 @@
+import { Doctor } from './doctor.model';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -13,6 +16,10 @@ export class Specialization {
 
   @Column()
   public specialization: string;
+
+  @ManyToMany(() => Doctor, (doctor) => doctor.specializations)
+  @JoinTable()
+  public doctors: Doctor[];
 
   @CreateDateColumn()
   createdAt: Date;
