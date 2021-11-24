@@ -1,8 +1,9 @@
+import { FilterDoctorDto } from 'src/dto/doctor/filter-doctor.dto';
 import { UserService } from './../user/user.service';
 import { Doctor } from './../../models/doctor.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Any, Equal, In, Repository } from 'typeorm';
 import { Specialization } from 'src/models/specialization.model';
 import { NewOrUpdatedDoctor } from 'src/dto/doctor/new-update-doctor.dto';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
@@ -17,6 +18,44 @@ export class DoctorService {
     private readonly specializationRepository: Repository<Specialization>,
     private readonly userService: UserService,
   ) {}
+
+  public async filterDoctor(
+    filterDoctorDto: FilterDoctorDto,
+  ): Promise<Doctor[]> {
+    if (
+      filterDoctorDto.jobTitle === 'EMPTY' &&
+      filterDoctorDto.specializations.length === 0
+    ) {
+      return await this.doctorRepository.find();
+    } else if (
+      filterDoctorDto.jobTitle !== 'EMPTY' &&
+      filterDoctorDto.specializations.length === 0
+    ) {
+      return await this.doctorRepository.find({
+        where: {
+          jobTitle: Equal(filterDoctorDto.jobTitle),
+        },
+      });
+    } else if (
+      filterDoctorDto.jobTitle !== 'EMPTY' &&
+      filterDoctorDto.specializations.length > 0
+    ) {
+      const specializations = await this.specializationRepository.find({
+        where: {
+          specialization: In(filterDoctorDto.specializations),
+        },
+      });
+
+      return await this.doctorRepository.find({
+        where: {
+          jobTitle: Equal(filterDoctorDto.jobTitle),
+          specializations: Any(specializations),
+        },
+      });
+    } else {
+      throw new HttpException('Invalid Filters', HttpStatus.BAD_REQUEST);
+    }
+  }
 
   public async createDoctor(
     loggedInUser: LoggedInUser,
