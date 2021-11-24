@@ -30,11 +30,11 @@ export class Doctor {
   @Column()
   public cost: number;
 
-  @ManyToMany(() => Specialization, (specialization) => specialization.doctors)
+  @ManyToMany(() => Specialization)
   @JoinTable()
   public specializations: Specialization[];
 
-  @OneToOne(() => User, (user) => user.doctor)
+  @OneToOne(() => User)
   @JoinColumn()
   public user: User;
 }

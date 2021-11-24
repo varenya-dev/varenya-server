@@ -1,7 +1,7 @@
 import { UserService } from './../user/user.service';
 import { Doctor } from './../../models/doctor.model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Specialization } from 'src/models/specialization.model';
 import { NewDoctorDto } from 'src/dto/doctor/new-doctor.dto';
@@ -22,12 +22,30 @@ export class DoctorService {
     loggedInUser: LoggedInUser,
     newDoctorDto: NewDoctorDto,
   ): Promise<Doctor> {
+    const checkDoctor = await this.doctorRepository.findOne({
+      user: loggedInUser.databaseUser,
+    });
+
+    if (checkDoctor != null) {
+      throw new HttpException('Doctor already exists.', HttpStatus.BAD_REQUEST);
+    }
+
     const specializations: Specialization[] = await Promise.all(
       newDoctorDto.specializations.map(async (specialization) => {
-        const newSpecialization: Specialization = new Specialization();
-        newSpecialization.specialization = specialization;
+        const formattedSpecialization = specialization.toUpperCase();
 
-        return await this.specializationRepository.save(newSpecialization);
+        const dbSpecialization = await this.specializationRepository.findOne({
+          specialization: formattedSpecialization,
+        });
+
+        if (dbSpecialization != null) {
+          return dbSpecialization;
+        } else {
+          const newSpecialization: Specialization = new Specialization();
+          newSpecialization.specialization = formattedSpecialization;
+
+          return await this.specializationRepository.save(newSpecialization);
+        }
       }),
     );
 

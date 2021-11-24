@@ -14,12 +14,8 @@ export class Specialization {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
-  @Column()
+  @Column({ unique: true })
   public specialization: string;
-
-  @ManyToMany(() => Doctor, (doctor) => doctor.specializations)
-  @JoinTable()
-  public doctors: Doctor[];
 
   @CreateDateColumn()
   createdAt: Date;

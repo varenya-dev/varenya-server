@@ -30,8 +30,4 @@ export class User {
     cascade: true,
   })
   public doctorAppointments: Appointment[];
-
-  @OneToOne(() => Doctor, (doctor) => doctor.user)
-  @JoinColumn()
-  public doctor: Doctor;
 }
