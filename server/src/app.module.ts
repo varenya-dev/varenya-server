@@ -1,3 +1,4 @@
+import { DoctorModule } from './modules/doctor/doctor.module';
 import { Specialization } from './models/specialization.model';
 import { AppointmentModule } from './modules/appointment/appointment.module';
 import { Appointment } from './models/appointment.model';
@@ -28,6 +29,7 @@ import { Doctor } from './models/doctor.model';
     AuthModule,
     NotificationModule,
     AppointmentModule,
+    DoctorModule,
   ],
   controllers: [],
   providers: [],

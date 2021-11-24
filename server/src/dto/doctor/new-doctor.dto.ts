@@ -2,14 +2,13 @@ import { IsDecimal, IsNotEmpty, IsUrl, MinLength } from 'class-validator';
 
 export class NewDoctorDto {
   @IsNotEmpty()
-  public userId: string;
-
-  @IsNotEmpty()
   public fullName: string;
 
   @IsNotEmpty()
   @IsUrl()
   public imageUrl: string;
+
+  @IsNotEmpty()
   public jobTitle: string;
 
   @IsNotEmpty()
