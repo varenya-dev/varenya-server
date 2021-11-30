@@ -1,3 +1,4 @@
+import { FetchBookedOrAvailableAppointmentsDto } from './../../dto/appointment/fetch-booked-available-appointments.dto';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { Appointment } from 'src/models/appointment.model';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
@@ -11,6 +12,7 @@ import {
   Put,
   UseGuards,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { RoleAuthGuard } from 'src/guards/role-auth.guard';
 import { Role } from 'src/decorators/role.decorator';
@@ -21,6 +23,9 @@ import { Roles } from 'src/enum/roles.enum';
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
+  @Get('available')
+  @Role(Roles.Main)
+  // public async getAvailableAppointments(@Query() fetchAvailableAppointmentsDto: FetchBookedOrAvailableAppointmentsDto): Promise<>
   @Get('patient')
   @Role(Roles.Main)
   public async getPatientAppointments(

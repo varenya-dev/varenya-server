@@ -176,11 +176,25 @@ export class AppointmentService {
       throw new HttpException('Doctor does not exist', HttpStatus.NOT_FOUND);
     }
 
-    const appointmentDetails = new Appointment(patientUser, doctorUser);
+    const checkAppointment = this.appointmentRepository.findOne({
+      where: {
+        scheduledFor: createAppointmentDto.timing,
+      },
+    });
 
-    await this.notificationService.handleAppointmentCreationNotification(
-      createAppointmentDto.doctorId,
-    );
+    if (checkAppointment != null) {
+      throw new HttpException(
+        'This slot has been already booked.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const appointmentDetails = new Appointment(patientUser, doctorUser);
+    appointmentDetails.scheduledFor = createAppointmentDto.timing;
+
+    // await this.notificationService.handleAppointmentCreationNotification(
+    //   createAppointmentDto.doctorId,
+    // );
 
     return await this.appointmentRepository.save(appointmentDetails);
   }

@@ -18,9 +18,6 @@ export class Appointment {
   @Column()
   scheduledFor: Date;
 
-  @Column({ default: ConfirmationStatus.Pending })
-  status: ConfirmationStatus;
-
   @CreateDateColumn()
   createdAt: Date;
 
