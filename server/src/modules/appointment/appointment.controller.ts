@@ -12,8 +12,6 @@ import {
   UseGuards,
   Delete,
 } from '@nestjs/common';
-import { PatientAppointmentResponse } from 'src/dto/appointment/patient-appointment-response.dto';
-import { DoctorAppointmentResponse } from 'src/dto/appointment/doctor-appointment-response.dto';
 import { RoleAuthGuard } from 'src/guards/role-auth.guard';
 import { Role } from 'src/decorators/role.decorator';
 import { Roles } from 'src/enum/roles.enum';
