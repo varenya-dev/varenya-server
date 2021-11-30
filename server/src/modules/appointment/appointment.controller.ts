@@ -25,7 +25,15 @@ export class AppointmentController {
 
   @Get('available')
   @Role(Roles.Main)
-  // public async getAvailableAppointments(@Query() fetchAvailableAppointmentsDto: FetchBookedOrAvailableAppointmentsDto): Promise<>
+  public async getAvailableAppointments(
+    @Query()
+    fetchAvailableAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
+  ): Promise<Date[]> {
+    return await this.appointmentService.fetchAvailableAppointmentSlots(
+      fetchAvailableAppointmentsDto,
+    );
+  }
+
   @Get('patient')
   @Role(Roles.Main)
   public async getPatientAppointments(

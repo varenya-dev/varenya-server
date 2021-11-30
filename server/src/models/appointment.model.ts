@@ -26,11 +26,13 @@ export class Appointment {
 
   @ManyToOne(() => User, (user) => user.patientAppointments, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   patientUser: User;
 
   @ManyToOne(() => Doctor, (doctor) => doctor.appointments, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   doctorUser: Doctor;
 

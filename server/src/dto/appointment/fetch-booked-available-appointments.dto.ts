@@ -1,5 +1,7 @@
-import { Doctor } from 'src/models/doctor.model';
+import { IsNotEmpty } from 'class-validator';
 export class FetchBookedOrAvailableAppointmentsDto {
   public date?: Date;
-  public doctor?: Doctor;
+
+  @IsNotEmpty()
+  public doctorId: string;
 }

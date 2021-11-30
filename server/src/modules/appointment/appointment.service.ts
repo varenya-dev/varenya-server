@@ -1,17 +1,13 @@
 import { FetchBookedOrAvailableAppointmentsDto } from '../../dto/appointment/fetch-booked-available-appointments.dto';
 import { DoctorService } from './../doctor/doctor.service';
-import { User } from 'src/models/user.model';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
-import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
-import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
 import { FirebaseService } from './../firebase/firebase.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
 import { Between, Repository } from 'typeorm';
-import { UserService } from '../user/user.service';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
 import { Doctor } from 'src/models/doctor.model';
@@ -22,7 +18,6 @@ export class AppointmentService {
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
 
-    private readonly userService: UserService,
     private readonly doctorService: DoctorService,
     private readonly firebaseService: FirebaseService,
     private readonly notificationService: NotificationService,
@@ -31,8 +26,14 @@ export class AppointmentService {
   public async fetchBookedAppointmentSlots(
     fetchBookedAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
   ): Promise<Appointment[]> {
-    const dateFlagOne = fetchBookedAppointmentsDto.date ?? new Date();
-    const dateFlagTwo = fetchBookedAppointmentsDto.date ?? new Date();
+    const dateFlagOne =
+      fetchBookedAppointmentsDto.date === null
+        ? new Date()
+        : new Date(fetchBookedAppointmentsDto.date);
+    const dateFlagTwo =
+      fetchBookedAppointmentsDto.date === null
+        ? new Date()
+        : new Date(fetchBookedAppointmentsDto.date);
 
     dateFlagOne.setHours(0, 0, 0);
     dateFlagTwo.setHours(0, 0, 0);
@@ -49,45 +50,48 @@ export class AppointmentService {
   public async fetchAvailableAppointmentSlots(
     fetchAvailableAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
   ): Promise<Date[]> {
-    if (fetchAvailableAppointmentsDto.doctor === null) {
-      throw new HttpException(
-        'Doctor details invalid.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const dateFlagOne =
+      fetchAvailableAppointmentsDto.date === null
+        ? new Date()
+        : new Date(fetchAvailableAppointmentsDto.date);
+    const dateFlagTwo =
+      fetchAvailableAppointmentsDto.date === null
+        ? new Date()
+        : new Date(fetchAvailableAppointmentsDto.date);
 
-    const dateFlagOne = fetchAvailableAppointmentsDto.date ?? new Date();
-    const dateFlagTwo = fetchAvailableAppointmentsDto.date ?? new Date();
-
-    dateFlagOne.setHours(0, 0, 0);
-    dateFlagTwo.setHours(0, 0, 0);
+    dateFlagOne.setHours(0, 0, 0, 0);
+    dateFlagTwo.setHours(0, 0, 0, 0);
 
     dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
 
-    let availableDates = this.prepareDummyTimeData();
+    let availableDates = this.prepareDummyTimeData(dateFlagOne);
+
+    const doctorData = await this.doctorService.getDoctorById(
+      fetchAvailableAppointmentsDto.doctorId,
+    );
 
     const bookedAppointments = await this.appointmentRepository.find({
       where: {
-        doctorUser: fetchAvailableAppointmentsDto.doctor,
+        doctorUser: doctorData,
         scheduledFor: Between(dateFlagOne, dateFlagTwo),
       },
     });
 
-    bookedAppointments.forEach((appointment) => {
-      availableDates = availableDates.filter(
-        (date) => date !== appointment.scheduledFor,
-      );
-    });
+    const bookedDates = bookedAppointments.map((appointment) =>
+      appointment.scheduledFor.getTime(),
+    );
 
-    return availableDates;
+    return availableDates.filter(
+      (date) => !bookedDates.includes(date.getTime()),
+    );
   }
 
-  private prepareDummyTimeData(): Date[] {
+  private prepareDummyTimeData(useDate: Date): Date[] {
     const dates: Date[] = [];
 
     for (let i = 9; i <= 17; i++) {
-      const newDate = new Date();
-      newDate.setHours(i, 0, 0);
+      const newDate = new Date(useDate.getTime());
+      newDate.setHours(i, 0, 0, 0);
 
       dates.push(newDate);
     }
@@ -176,7 +180,7 @@ export class AppointmentService {
       throw new HttpException('Doctor does not exist', HttpStatus.NOT_FOUND);
     }
 
-    const checkAppointment = this.appointmentRepository.findOne({
+    const checkAppointment = await this.appointmentRepository.findOne({
       where: {
         scheduledFor: createAppointmentDto.timing,
       },
