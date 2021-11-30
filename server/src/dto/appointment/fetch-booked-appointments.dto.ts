@@ -1,10 +1,7 @@
 import { IsDateString, IsNotEmpty } from 'class-validator';
 
-export class CreateAppointmentDto {
-  @IsNotEmpty()
-  doctorId: string;
-
+export class FetchBookedAppointmentsDto {
   @IsNotEmpty()
   @IsDateString()
-  timing: Date;
+  public date: Date;
 }

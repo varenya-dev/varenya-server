@@ -1,4 +1,5 @@
-import { FetchBookedOrAvailableAppointmentsDto } from '../../dto/appointment/fetch-booked-available-appointments.dto';
+import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
+import { FetchAvailableAppointmentsDto } from '../../dto/appointment/fetch-available-appointments.dto';
 import { DoctorService } from './../doctor/doctor.service';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
@@ -11,6 +12,7 @@ import { Between, Repository } from 'typeorm';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
 import { Doctor } from 'src/models/doctor.model';
+import { FetchBookedAppointmentsDto } from 'src/dto/appointment/fetch-booked-appointments.dto';
 
 @Injectable()
 export class AppointmentService {
@@ -24,8 +26,9 @@ export class AppointmentService {
   ) {}
 
   public async fetchBookedAppointmentSlots(
-    fetchBookedAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
-  ): Promise<Appointment[]> {
+    loggedInUser: LoggedInUser,
+    fetchBookedAppointmentsDto: FetchBookedAppointmentsDto,
+  ): Promise<DoctorAppointmentResponse[]> {
     const dateFlagOne =
       fetchBookedAppointmentsDto.date === null
         ? new Date()
@@ -40,15 +43,32 @@ export class AppointmentService {
 
     dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
 
-    return await this.appointmentRepository.find({
+    const doctorData = await this.doctorService.getDoctorByFirebaseId(
+      loggedInUser.firebaseUser.uid,
+    );
+
+    const doctorAppointments = await this.appointmentRepository.find({
       where: {
+        doctorUser: doctorData,
         scheduledFor: Between(dateFlagOne, dateFlagTwo),
       },
     });
+
+    const mappedAppointments = await Promise.all(
+      doctorAppointments.map(async (appointment) => {
+        const patientDetails = await this.getPatientDetails(
+          appointment.patientUser.firebaseId,
+        );
+
+        return new DoctorAppointmentResponse(appointment, patientDetails);
+      }),
+    );
+
+    return mappedAppointments;
   }
 
   public async fetchAvailableAppointmentSlots(
-    fetchAvailableAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
+    fetchAvailableAppointmentsDto: FetchAvailableAppointmentsDto,
   ): Promise<Date[]> {
     const dateFlagOne =
       fetchAvailableAppointmentsDto.date === null
