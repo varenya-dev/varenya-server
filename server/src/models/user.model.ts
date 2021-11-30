@@ -25,9 +25,4 @@ export class User {
     cascade: true,
   })
   public patientAppointments: Appointment[];
-
-  @OneToMany(() => Appointment, (appointment) => appointment.doctorUser, {
-    cascade: true,
-  })
-  public doctorAppointments: Appointment[];
 }

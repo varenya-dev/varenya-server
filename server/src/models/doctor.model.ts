@@ -1,4 +1,8 @@
 import {
+  fetchDefaultDoctorShiftStart,
+  fetchDefaultDoctorShiftEnd,
+} from './../constants/doctor-shifts.constant';
+import {
   Column,
   Entity,
   JoinColumn,
@@ -31,6 +35,12 @@ export class Doctor {
 
   @Column()
   public cost: number;
+
+  @Column({ default: fetchDefaultDoctorShiftStart() })
+  public shiftStartTime: Date;
+
+  @Column({ default: fetchDefaultDoctorShiftEnd() })
+  public shiftEndTime: Date;
 
   @ManyToMany(
     () => Specialization,
