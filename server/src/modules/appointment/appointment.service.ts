@@ -1,3 +1,4 @@
+import { FetchBookedAppointmentsDto } from './../../dto/appointment/fetch-booked-appointments.dto';
 import { DoctorService } from './../doctor/doctor.service';
 import { User } from 'src/models/user.model';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
@@ -9,7 +10,7 @@ import { FirebaseService } from './../firebase/firebase.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
@@ -27,8 +28,22 @@ export class AppointmentService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  public async fetchAvailableAppointmentSlots(): Promise<string[]> {
-    return [];
+  public async fetchBookedAppointmentSlots(
+    fetchBookedAppointmentsDto: FetchBookedAppointmentsDto,
+  ): Promise<Appointment[]> {
+    const dateFlagOne = fetchBookedAppointmentsDto.date ?? new Date();
+    const dateFlagTwo = fetchBookedAppointmentsDto.date ?? new Date();
+
+    dateFlagOne.setHours(0, 0, 0);
+    dateFlagTwo.setHours(0, 0, 0);
+
+    dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
+
+    return await this.appointmentRepository.find({
+      where: {
+        scheduledFor: Between(dateFlagOne, dateFlagTwo),
+      },
+    });
   }
 
   public async getPatientAppointments(
