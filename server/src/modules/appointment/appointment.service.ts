@@ -24,6 +24,10 @@ export class AppointmentService {
     private readonly notificationService: NotificationService,
   ) {}
 
+  public async fetchAvailableAppointmentSlots(): Promise<string[]> {
+    return [];
+  }
+
   public async getPatientAppointments(
     loggedInUser: LoggedInUser,
   ): Promise<PatientAppointmentResponse[]> {

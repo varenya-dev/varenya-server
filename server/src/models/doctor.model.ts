@@ -4,9 +4,11 @@ import {
   JoinColumn,
   JoinTable,
   ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Appointment } from './appointment.model';
 import { Specialization } from './specialization.model';
 import { User } from './user.model';
 
@@ -41,4 +43,9 @@ export class Doctor {
   @OneToOne(() => User)
   @JoinColumn()
   public user: User;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.doctorUser, {
+    cascade: true,
+  })
+  public appointments: Appointment[];
 }
