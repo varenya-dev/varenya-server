@@ -21,6 +21,27 @@ export class DoctorService {
     private readonly userService: UserService,
   ) {}
 
+  public async getDoctorById(doctorId: string): Promise<Doctor> {
+    return await this.doctorRepository.findOneOrFail({
+      where: {
+        id: doctorId,
+      },
+      relations: ['user'],
+    });
+  }
+
+  public async getDoctorByFirebaseId(firebaseId: string): Promise<Doctor> {
+    const doctorUser = await this.userService.findOneUserByFirebaseId(
+      firebaseId,
+    );
+    return await this.doctorRepository.findOneOrFail({
+      where: {
+        user: doctorUser,
+      },
+      relations: ['user'],
+    });
+  }
+
   public async getSpecializations(): Promise<Specialization[]> {
     return await this.specializationRepository.find();
   }

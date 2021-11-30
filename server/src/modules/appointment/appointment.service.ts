@@ -1,3 +1,4 @@
+import { DoctorService } from './../doctor/doctor.service';
 import { User } from 'src/models/user.model';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
@@ -12,6 +13,7 @@ import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
+import { Doctor } from 'src/models/doctor.model';
 
 @Injectable()
 export class AppointmentService {
@@ -20,6 +22,7 @@ export class AppointmentService {
     private readonly appointmentRepository: Repository<Appointment>,
 
     private readonly userService: UserService,
+    private readonly doctorService: DoctorService,
     private readonly firebaseService: FirebaseService,
     private readonly notificationService: NotificationService,
   ) {}
@@ -30,7 +33,7 @@ export class AppointmentService {
 
   public async getPatientAppointments(
     loggedInUser: LoggedInUser,
-  ): Promise<PatientAppointmentResponse[]> {
+  ): Promise<Appointment[]> {
     const patientUser = loggedInUser.databaseUser;
 
     const patientAppointments = await this.appointmentRepository.find({
@@ -40,42 +43,24 @@ export class AppointmentService {
       relations: ['doctorUser', 'patientUser'],
     });
 
-    const mappedAppointments = await Promise.all(
-      patientAppointments.map(async (appointment) => {
-        const doctorDetails = await this.getDoctorDetails(
-          appointment.doctorUser.firebaseId,
-        );
-
-        return new PatientAppointmentResponse(appointment, doctorDetails);
-      }),
-    );
-
-    return mappedAppointments;
+    return patientAppointments;
   }
 
   public async getDoctorAppointments(
     loggedInUser: LoggedInUser,
-  ): Promise<DoctorAppointmentResponse[]> {
-    const doctorUser = loggedInUser.databaseUser;
+  ): Promise<Appointment[]> {
+    const doctorData = await this.doctorService.getDoctorByFirebaseId(
+      loggedInUser.firebaseUser.uid,
+    );
 
     const doctorAppointments = await this.appointmentRepository.find({
       where: {
-        doctorUser: doctorUser,
+        doctorUser: doctorData,
       },
       relations: ['doctorUser', 'patientUser'],
     });
 
-    const mappedAppointments = await Promise.all(
-      doctorAppointments.map(async (appointment) => {
-        const patientDetails = await this.getPatientDetails(
-          appointment.patientUser.firebaseId,
-        );
-
-        return new DoctorAppointmentResponse(appointment, patientDetails);
-      }),
-    );
-
-    return mappedAppointments;
+    return doctorAppointments;
   }
 
   private async getDoctorDetails(doctorId: string): Promise<DoctorDto> {
@@ -118,9 +103,9 @@ export class AppointmentService {
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
     const patientUser = loggedInUser.databaseUser;
-    let doctorUser: User;
+    let doctorUser: Doctor;
     try {
-      doctorUser = await this.userService.findOneUserByFirebaseId(
+      doctorUser = await this.doctorService.getDoctorById(
         createAppointmentDto.doctorId,
       );
     } catch (error) {
@@ -181,7 +166,7 @@ export class AppointmentService {
     }
 
     await this.notificationService.handleAppointmentDeleteNotification([
-      appointmentDb.doctorUser.firebaseId,
+      appointmentDb.doctorUser.user.firebaseId,
       appointmentDb.patientUser.firebaseId,
     ]);
 

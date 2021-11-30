@@ -27,7 +27,7 @@ export class AppointmentController {
   @Role(Roles.Main)
   public async getPatientAppointments(
     @AuthUser() loggedInUser: LoggedInUser,
-  ): Promise<PatientAppointmentResponse[]> {
+  ): Promise<Appointment[]> {
     return await this.appointmentService.getPatientAppointments(loggedInUser);
   }
 
@@ -35,7 +35,7 @@ export class AppointmentController {
   @Role(Roles.Professional)
   public async getDoctorAppointments(
     @AuthUser() loggedInUser: LoggedInUser,
-  ): Promise<DoctorAppointmentResponse[]> {
+  ): Promise<Appointment[]> {
     return await this.appointmentService.getDoctorAppointments(loggedInUser);
   }
 
