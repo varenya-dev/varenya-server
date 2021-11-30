@@ -29,14 +29,8 @@ export class AppointmentService {
     loggedInUser: LoggedInUser,
     fetchBookedAppointmentsDto: FetchBookedAppointmentsDto,
   ): Promise<DoctorAppointmentResponse[]> {
-    const dateFlagOne =
-      fetchBookedAppointmentsDto.date === null
-        ? new Date()
-        : new Date(fetchBookedAppointmentsDto.date);
-    const dateFlagTwo =
-      fetchBookedAppointmentsDto.date === null
-        ? new Date()
-        : new Date(fetchBookedAppointmentsDto.date);
+    const dateFlagOne = new Date(fetchBookedAppointmentsDto.date);
+    const dateFlagTwo = new Date(fetchBookedAppointmentsDto.date);
 
     dateFlagOne.setHours(0, 0, 0);
     dateFlagTwo.setHours(0, 0, 0);
@@ -70,14 +64,8 @@ export class AppointmentService {
   public async fetchAvailableAppointmentSlots(
     fetchAvailableAppointmentsDto: FetchAvailableAppointmentsDto,
   ): Promise<Date[]> {
-    const dateFlagOne =
-      fetchAvailableAppointmentsDto.date === null
-        ? new Date()
-        : new Date(fetchAvailableAppointmentsDto.date);
-    const dateFlagTwo =
-      fetchAvailableAppointmentsDto.date === null
-        ? new Date()
-        : new Date(fetchAvailableAppointmentsDto.date);
+    const dateFlagOne = new Date(fetchAvailableAppointmentsDto.date);
+    const dateFlagTwo = new Date(fetchAvailableAppointmentsDto.date);
 
     dateFlagOne.setHours(0, 0, 0, 0);
     dateFlagTwo.setHours(0, 0, 0, 0);
