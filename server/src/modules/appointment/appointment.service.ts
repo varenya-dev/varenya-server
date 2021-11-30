@@ -1,4 +1,4 @@
-import { FetchBookedAppointmentsDto } from './../../dto/appointment/fetch-booked-appointments.dto';
+import { FetchBookedOrAvailableAppointmentsDto } from '../../dto/appointment/fetch-booked-available-appointments.dto';
 import { DoctorService } from './../doctor/doctor.service';
 import { User } from 'src/models/user.model';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
@@ -29,7 +29,7 @@ export class AppointmentService {
   ) {}
 
   public async fetchBookedAppointmentSlots(
-    fetchBookedAppointmentsDto: FetchBookedAppointmentsDto,
+    fetchBookedAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
   ): Promise<Appointment[]> {
     const dateFlagOne = fetchBookedAppointmentsDto.date ?? new Date();
     const dateFlagTwo = fetchBookedAppointmentsDto.date ?? new Date();
@@ -44,6 +44,55 @@ export class AppointmentService {
         scheduledFor: Between(dateFlagOne, dateFlagTwo),
       },
     });
+  }
+
+  public async fetchAvailableAppointmentSlots(
+    fetchAvailableAppointmentsDto: FetchBookedOrAvailableAppointmentsDto,
+  ): Promise<Date[]> {
+    if (fetchAvailableAppointmentsDto.doctor === null) {
+      throw new HttpException(
+        'Doctor details invalid.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const dateFlagOne = fetchAvailableAppointmentsDto.date ?? new Date();
+    const dateFlagTwo = fetchAvailableAppointmentsDto.date ?? new Date();
+
+    dateFlagOne.setHours(0, 0, 0);
+    dateFlagTwo.setHours(0, 0, 0);
+
+    dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
+
+    let availableDates = this.prepareDummyTimeData();
+
+    const bookedAppointments = await this.appointmentRepository.find({
+      where: {
+        doctorUser: fetchAvailableAppointmentsDto.doctor,
+        scheduledFor: Between(dateFlagOne, dateFlagTwo),
+      },
+    });
+
+    bookedAppointments.forEach((appointment) => {
+      availableDates = availableDates.filter(
+        (date) => date !== appointment.scheduledFor,
+      );
+    });
+
+    return availableDates;
+  }
+
+  private prepareDummyTimeData(): Date[] {
+    const dates: Date[] = [];
+
+    for (let i = 9; i <= 17; i++) {
+      const newDate = new Date();
+      newDate.setHours(i, 0, 0);
+
+      dates.push(newDate);
+    }
+
+    return dates;
   }
 
   public async getPatientAppointments(
