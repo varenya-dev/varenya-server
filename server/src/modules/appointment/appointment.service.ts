@@ -1,17 +1,17 @@
-import { User } from 'src/models/user.model';
+import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
+import { FetchAvailableAppointmentsDto } from '../../dto/appointment/fetch-available-appointments.dto';
+import { DoctorService } from './../doctor/doctor.service';
 import { LoggedInUser } from './../../dto/logged-in-user.dto';
 import { NotificationService } from './../notifications/notification.service';
 import { CreateAppointmentDto } from './../../dto/appointment/create-appointment.dto';
-import { DoctorAppointmentResponse } from './../../dto/appointment/doctor-appointment-response.dto';
-import { PatientAppointmentResponse } from './../../dto/appointment/patient-appointment-response.dto';
 import { FirebaseService } from './../firebase/firebase.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
-import { Repository } from 'typeorm';
-import { UserService } from '../user/user.service';
-import { DoctorDto } from 'src/dto/doctor.dto';
+import { Between, Repository } from 'typeorm';
 import { PatientDto } from 'src/dto/patient.dto';
+import { Doctor } from 'src/models/doctor.model';
+import { FetchBookedAppointmentsDto } from 'src/dto/appointment/fetch-booked-appointments.dto';
 
 @Injectable()
 export class AppointmentService {
@@ -19,46 +19,32 @@ export class AppointmentService {
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
 
-    private readonly userService: UserService,
+    private readonly doctorService: DoctorService,
     private readonly firebaseService: FirebaseService,
     private readonly notificationService: NotificationService,
   ) {}
 
-  public async getPatientAppointments(
+  public async fetchBookedAppointmentSlots(
     loggedInUser: LoggedInUser,
-  ): Promise<PatientAppointmentResponse[]> {
-    const patientUser = loggedInUser.databaseUser;
-
-    const patientAppointments = await this.appointmentRepository.find({
-      where: {
-        patientUser: patientUser,
-      },
-      relations: ['doctorUser', 'patientUser'],
-    });
-
-    const mappedAppointments = await Promise.all(
-      patientAppointments.map(async (appointment) => {
-        const doctorDetails = await this.getDoctorDetails(
-          appointment.doctorUser.firebaseId,
-        );
-
-        return new PatientAppointmentResponse(appointment, doctorDetails);
-      }),
-    );
-
-    return mappedAppointments;
-  }
-
-  public async getDoctorAppointments(
-    loggedInUser: LoggedInUser,
+    fetchBookedAppointmentsDto: FetchBookedAppointmentsDto,
   ): Promise<DoctorAppointmentResponse[]> {
-    const doctorUser = loggedInUser.databaseUser;
+    const dateFlagOne = new Date(fetchBookedAppointmentsDto.date);
+    const dateFlagTwo = new Date(fetchBookedAppointmentsDto.date);
+
+    dateFlagOne.setHours(0, 0, 0);
+    dateFlagTwo.setHours(0, 0, 0);
+
+    dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
+
+    const doctorData = await this.doctorService.getDoctorByFirebaseId(
+      loggedInUser.firebaseUser.uid,
+    );
 
     const doctorAppointments = await this.appointmentRepository.find({
       where: {
-        doctorUser: doctorUser,
+        doctorUser: doctorData,
+        scheduledFor: Between(dateFlagOne, dateFlagTwo),
       },
-      relations: ['doctorUser', 'patientUser'],
     });
 
     const mappedAppointments = await Promise.all(
@@ -74,25 +60,90 @@ export class AppointmentService {
     return mappedAppointments;
   }
 
-  private async getDoctorDetails(doctorId: string): Promise<DoctorDto> {
-    const doctorData = await this.firebaseService.firebaseFirestore
-      .collection('doctors')
-      .doc(doctorId)
-      .get();
+  public async fetchAvailableAppointmentSlots(
+    fetchAvailableAppointmentsDto: FetchAvailableAppointmentsDto,
+  ): Promise<Date[]> {
+    const dateFlagOne = new Date(fetchAvailableAppointmentsDto.date);
+    const dateFlagTwo = new Date(fetchAvailableAppointmentsDto.date);
 
-    const doctorJson = doctorData.data();
+    dateFlagOne.setHours(0, 0, 0, 0);
+    dateFlagTwo.setHours(0, 0, 0, 0);
 
-    const doctorObject = new DoctorDto(
-      doctorJson['id'],
-      doctorJson['clinicAddress'],
-      doctorJson['cost'],
-      doctorJson['fullName'],
-      doctorJson['imageUrl'],
-      doctorJson['jobTitle'],
-      doctorJson['specializations'],
+    dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
+
+    const doctorData = await this.doctorService.getDoctorById(
+      fetchAvailableAppointmentsDto.doctorId,
     );
 
-    return doctorObject;
+    let availableDates = this.prepareDummyTimeData(
+      dateFlagOne,
+      doctorData.shiftStartTime,
+      doctorData.shiftEndTime,
+    );
+
+    const bookedAppointments = await this.appointmentRepository.find({
+      where: {
+        doctorUser: doctorData,
+        scheduledFor: Between(dateFlagOne, dateFlagTwo),
+      },
+    });
+
+    const bookedDates = bookedAppointments.map((appointment) =>
+      appointment.scheduledFor.getTime(),
+    );
+
+    return availableDates.filter(
+      (date) => !bookedDates.includes(date.getTime()),
+    );
+  }
+
+  private prepareDummyTimeData(
+    useDate: Date,
+    startTime: Date,
+    endTime: Date,
+  ): Date[] {
+    const dates: Date[] = [];
+
+    for (let i = startTime.getHours(); i < endTime.getHours(); i++) {
+      const newDate = new Date(useDate.getTime());
+      newDate.setHours(i, 0, 0, 0);
+
+      dates.push(newDate);
+    }
+
+    return dates;
+  }
+
+  public async getPatientAppointments(
+    loggedInUser: LoggedInUser,
+  ): Promise<Appointment[]> {
+    const patientUser = loggedInUser.databaseUser;
+
+    const patientAppointments = await this.appointmentRepository.find({
+      where: {
+        patientUser: patientUser,
+      },
+      relations: ['doctorUser', 'patientUser'],
+    });
+
+    return patientAppointments;
+  }
+
+  public async getDoctorAppointments(
+    loggedInUser: LoggedInUser,
+  ): Promise<Appointment[]> {
+    const doctorData = await this.doctorService.getDoctorByFirebaseId(
+      loggedInUser.firebaseUser.uid,
+    );
+
+    const doctorAppointments = await this.appointmentRepository.find({
+      where: {
+        doctorUser: doctorData,
+      },
+      relations: ['doctorUser', 'patientUser'],
+    });
+
+    return doctorAppointments;
   }
 
   private async getPatientDetails(patientId: string): Promise<PatientDto> {
@@ -114,20 +165,30 @@ export class AppointmentService {
     createAppointmentDto: CreateAppointmentDto,
   ): Promise<Appointment> {
     const patientUser = loggedInUser.databaseUser;
-    let doctorUser: User;
+    let doctorUser: Doctor;
     try {
-      doctorUser = await this.userService.findOneUserByFirebaseId(
+      doctorUser = await this.doctorService.getDoctorById(
         createAppointmentDto.doctorId,
       );
     } catch (error) {
       throw new HttpException('Doctor does not exist', HttpStatus.NOT_FOUND);
     }
 
-    const appointmentDetails = new Appointment(patientUser, doctorUser);
+    const checkAppointment = await this.appointmentRepository.findOne({
+      where: {
+        scheduledFor: createAppointmentDto.timing,
+      },
+    });
 
-    await this.notificationService.handleAppointmentCreationNotification(
-      createAppointmentDto.doctorId,
-    );
+    if (checkAppointment != null) {
+      throw new HttpException(
+        'This slot has been already booked.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const appointmentDetails = new Appointment(patientUser, doctorUser);
+    appointmentDetails.scheduledFor = createAppointmentDto.timing;
 
     return await this.appointmentRepository.save(appointmentDetails);
   }
@@ -175,11 +236,6 @@ export class AppointmentService {
         HttpStatus.NOT_FOUND,
       );
     }
-
-    await this.notificationService.handleAppointmentDeleteNotification([
-      appointmentDb.doctorUser.firebaseId,
-      appointmentDb.patientUser.firebaseId,
-    ]);
 
     return await this.appointmentRepository.remove(appointment);
   }

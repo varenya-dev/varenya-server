@@ -1,12 +1,18 @@
 import {
+  fetchDefaultDoctorShiftStart,
+  fetchDefaultDoctorShiftEnd,
+} from './../constants/doctor-shifts.constant';
+import {
   Column,
   Entity,
   JoinColumn,
   JoinTable,
   ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Appointment } from './appointment.model';
 import { Specialization } from './specialization.model';
 import { User } from './user.model';
 
@@ -30,6 +36,12 @@ export class Doctor {
   @Column()
   public cost: number;
 
+  @Column({ default: fetchDefaultDoctorShiftStart() })
+  public shiftStartTime: Date;
+
+  @Column({ default: fetchDefaultDoctorShiftEnd() })
+  public shiftEndTime: Date;
+
   @ManyToMany(
     () => Specialization,
     (specialization) => specialization.doctors,
@@ -41,4 +53,9 @@ export class Doctor {
   @OneToOne(() => User)
   @JoinColumn()
   public user: User;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.doctorUser, {
+    cascade: true,
+  })
+  public appointments: Appointment[];
 }

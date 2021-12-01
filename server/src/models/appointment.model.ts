@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './user.model';
 import { ConfirmationStatus } from './../enum/confirmation-status.enum';
+import { Doctor } from './doctor.model';
 
 @Entity()
 export class Appointment {
@@ -17,9 +18,6 @@ export class Appointment {
   @Column()
   scheduledFor: Date;
 
-  @Column({ default: ConfirmationStatus.Pending })
-  status: ConfirmationStatus;
-
   @CreateDateColumn()
   createdAt: Date;
 
@@ -28,15 +26,17 @@ export class Appointment {
 
   @ManyToOne(() => User, (user) => user.patientAppointments, {
     onDelete: 'CASCADE',
+    eager: true,
   })
   patientUser: User;
 
-  @ManyToOne(() => User, (user) => user.doctorAppointments, {
+  @ManyToOne(() => Doctor, (doctor) => doctor.appointments, {
     onDelete: 'CASCADE',
+    eager: true,
   })
-  doctorUser: User;
+  doctorUser: Doctor;
 
-  constructor(patientUser: User, doctorUser: User) {
+  constructor(patientUser: User, doctorUser: Doctor) {
     this.scheduledFor = new Date(Date.now());
     this.patientUser = patientUser;
     this.doctorUser = doctorUser;
