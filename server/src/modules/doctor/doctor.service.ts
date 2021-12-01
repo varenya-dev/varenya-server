@@ -245,6 +245,8 @@ export class DoctorService {
     dbDoctor.clinicAddress = updatedDoctorDto.clinicAddress;
     dbDoctor.cost = updatedDoctorDto.cost;
     dbDoctor.specializations = specializations;
+    dbDoctor.shiftStartTime = updatedDoctorDto.shiftStartTime;
+    dbDoctor.shiftEndTime = updatedDoctorDto.shiftEndTime;
 
     const updatedDoctor = await this.doctorRepository.save(dbDoctor);
 

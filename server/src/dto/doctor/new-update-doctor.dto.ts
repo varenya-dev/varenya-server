@@ -2,8 +2,8 @@ import {
   IsNotEmpty,
   IsNumber,
   IsUrl,
-  MinLength,
   IsArray,
+  IsDateString,
 } from 'class-validator';
 
 export class NewOrUpdatedDoctor {
@@ -26,4 +26,10 @@ export class NewOrUpdatedDoctor {
 
   @IsArray()
   public specializations: string[];
+
+  @IsDateString()
+  public shiftStartTime: Date;
+
+  @IsDateString()
+  public shiftEndTime: Date;
 }

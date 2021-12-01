@@ -9,7 +9,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Appointment } from 'src/models/appointment.model';
 import { Between, Repository } from 'typeorm';
-import { DoctorDto } from 'src/dto/doctor.dto';
 import { PatientDto } from 'src/dto/patient.dto';
 import { Doctor } from 'src/models/doctor.model';
 import { FetchBookedAppointmentsDto } from 'src/dto/appointment/fetch-booked-appointments.dto';
@@ -72,10 +71,14 @@ export class AppointmentService {
 
     dateFlagTwo.setDate(dateFlagTwo.getDate() + 1);
 
-    let availableDates = this.prepareDummyTimeData(dateFlagOne);
-
     const doctorData = await this.doctorService.getDoctorById(
       fetchAvailableAppointmentsDto.doctorId,
+    );
+
+    let availableDates = this.prepareDummyTimeData(
+      dateFlagOne,
+      doctorData.shiftStartTime,
+      doctorData.shiftEndTime,
     );
 
     const bookedAppointments = await this.appointmentRepository.find({
@@ -94,10 +97,14 @@ export class AppointmentService {
     );
   }
 
-  private prepareDummyTimeData(useDate: Date): Date[] {
+  private prepareDummyTimeData(
+    useDate: Date,
+    startTime: Date,
+    endTime: Date,
+  ): Date[] {
     const dates: Date[] = [];
 
-    for (let i = 9; i <= 17; i++) {
+    for (let i = startTime.getHours(); i < endTime.getHours(); i++) {
       const newDate = new Date(useDate.getTime());
       newDate.setHours(i, 0, 0, 0);
 
@@ -137,27 +144,6 @@ export class AppointmentService {
     });
 
     return doctorAppointments;
-  }
-
-  private async getDoctorDetails(doctorId: string): Promise<DoctorDto> {
-    const doctorData = await this.firebaseService.firebaseFirestore
-      .collection('doctors')
-      .doc(doctorId)
-      .get();
-
-    const doctorJson = doctorData.data();
-
-    const doctorObject = new DoctorDto(
-      doctorJson['id'],
-      doctorJson['clinicAddress'],
-      doctorJson['cost'],
-      doctorJson['fullName'],
-      doctorJson['imageUrl'],
-      doctorJson['jobTitle'],
-      doctorJson['specializations'],
-    );
-
-    return doctorObject;
   }
 
   private async getPatientDetails(patientId: string): Promise<PatientDto> {
@@ -203,10 +189,6 @@ export class AppointmentService {
 
     const appointmentDetails = new Appointment(patientUser, doctorUser);
     appointmentDetails.scheduledFor = createAppointmentDto.timing;
-
-    // await this.notificationService.handleAppointmentCreationNotification(
-    //   createAppointmentDto.doctorId,
-    // );
 
     return await this.appointmentRepository.save(appointmentDetails);
   }
@@ -254,11 +236,6 @@ export class AppointmentService {
         HttpStatus.NOT_FOUND,
       );
     }
-
-    await this.notificationService.handleAppointmentDeleteNotification([
-      appointmentDb.doctorUser.user.firebaseId,
-      appointmentDb.patientUser.firebaseId,
-    ]);
 
     return await this.appointmentRepository.remove(appointment);
   }
