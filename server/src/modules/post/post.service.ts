@@ -1,3 +1,4 @@
+import { DeletePostDto } from './../../dto/post/delete-post.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { CreatePostDto } from './../../dto/post/new-post.dto';
 import { PostImage } from './../../models/post-image.model';
@@ -131,5 +132,28 @@ export class PostService {
     postToBeUpdated.images = dbPostImages;
 
     return await this.postRepository.save(postToBeUpdated);
+  }
+
+  public async deletePost(
+    loggedInUser: LoggedInUser,
+    deletePostDto: DeletePostDto,
+  ): Promise<Post> {
+    const postToBeUpdated = await this.postRepository.findOne({
+      where: {
+        id: deletePostDto.id,
+        user: loggedInUser.databaseUser,
+      },
+      relations: ['images'],
+    });
+
+    if (!postToBeUpdated) {
+      throw new NotFoundException(
+        'Post not found for the given post ID and user',
+      );
+    }
+
+    await this.postImageRepository.remove(postToBeUpdated.images);
+
+    return await this.postRepository.remove(postToBeUpdated);
   }
 }
