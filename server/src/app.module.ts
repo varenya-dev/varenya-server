@@ -1,3 +1,4 @@
+import { PostCategory } from './models/post-category.model';
 import { DoctorModule } from './modules/doctor/doctor.module';
 import { Specialization } from './models/specialization.model';
 import { AppointmentModule } from './modules/appointment/appointment.module';
@@ -22,7 +23,7 @@ import { Doctor } from './models/doctor.model';
       database: process.env.DATABASE_NAME,
       synchronize: true,
       logging: true,
-      entities: [User, Appointment, Specialization, Doctor],
+      entities: [User, Appointment, Specialization, Doctor, PostCategory],
     }),
     FirebaseModule,
     UserModule,
