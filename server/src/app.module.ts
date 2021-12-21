@@ -12,6 +12,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './models/user.model';
 import { Doctor } from './models/doctor.model';
+import { Post } from './models/post.model';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { Doctor } from './models/doctor.model';
         Doctor,
         PostCategory,
         PostImage,
+        Post,
       ],
     }),
     FirebaseModule,

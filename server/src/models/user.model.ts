@@ -9,6 +9,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Post } from './post.model';
 
 @Entity()
 export class User {
@@ -25,4 +26,9 @@ export class User {
     cascade: true,
   })
   public patientAppointments: Appointment[];
+
+  @OneToMany(() => Post, (post) => post.user, {
+    cascade: true,
+  })
+  public posts: Post[];
 }

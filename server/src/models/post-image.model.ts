@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Post } from './post.model';
 
 @Entity()
 export class PostImage {
@@ -7,4 +8,7 @@ export class PostImage {
 
   @Column()
   public imageUrl: string;
+
+  @ManyToOne(() => Post, (post) => post.images, { onDelete: 'CASCADE' })
+  public post: Post;
 }
