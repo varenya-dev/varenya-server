@@ -1,6 +1,7 @@
+import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { PostService } from './post.service';
 import { RoleAuthGuard } from 'src/guards/role-auth.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
 import { Role } from 'src/decorators/role.decorator';
 import { Roles } from 'src/enum/roles.enum';
 import { CreatePostDto } from 'src/dto/post/new-post.dto';
@@ -20,5 +21,15 @@ export class PostController {
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostModel> {
     return await this.postService.createPost(loggedInUser, createPostDto);
+  }
+
+  @Put()
+  @Role(Roles.Main, Roles.Professional)
+  public async updatePost(
+    @AuthUser() loggedInUser: LoggedInUser,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<PostModel> {
+    // NEED TO BE TESTED.
+    return await this.postService.updatePost(loggedInUser, updatePostDto);
   }
 }

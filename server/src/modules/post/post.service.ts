@@ -104,6 +104,8 @@ export class PostService {
       }),
     );
 
+    await this.postImageRepository.remove(postToBeUpdated.images);
+
     const dbPostImages = await Promise.all(
       updatePostDto.images.map(async (image) => {
         const dbImage = await this.postImageRepository.findOne({
