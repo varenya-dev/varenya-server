@@ -24,22 +24,23 @@ export class PostService {
     loggedInUser: LoggedInUser,
     createPostDto: CreatePostDto,
   ): Promise<Post> {
-    //NEED TO TEST.
     const dbPostCategories = await Promise.all(
       createPostDto.categories.map(async (category) => {
         const correctedCategory = category.toUpperCase();
 
         const dbPostCategory = await this.postCategoryRepository.findOne({
-          categoryName: correctedCategory,
+          where: {
+            categoryName: correctedCategory,
+          },
         });
 
-        if (dbPostCategories !== null) {
+        if (dbPostCategory) {
           return dbPostCategory;
         } else {
           const newPostCategory = new PostCategory();
           newPostCategory.categoryName = correctedCategory;
 
-          await this.postCategoryRepository.save(newPostCategory);
+          return await this.postCategoryRepository.save(newPostCategory);
         }
       }),
     );
@@ -62,14 +63,6 @@ export class PostService {
 
     const dbPost = await this.postRepository.save(newPost);
 
-    const updatedPostCategories = dbPostCategories.map((category) => {
-      category.posts.push(newPost);
-
-      return category;
-    });
-
-    await this.postCategoryRepository.save(updatedPostCategories);
-
-    return newPost;
+    return dbPost;
   }
 }
