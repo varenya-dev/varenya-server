@@ -178,7 +178,7 @@ export class DoctorService {
           specialization: formattedSpecialization,
         });
 
-        if (dbSpecialization != null) {
+        if (dbSpecialization !== null) {
           return dbSpecialization;
         } else {
           const newSpecialization: Specialization = new Specialization();

@@ -1,3 +1,4 @@
+import { PostModule } from './modules/post/post.module';
 import { PostImage } from './models/post-image.model';
 import { PostCategory } from './models/post-category.model';
 import { DoctorModule } from './modules/doctor/doctor.module';
@@ -41,6 +42,7 @@ import { Post } from './models/post.model';
     NotificationModule,
     AppointmentModule,
     DoctorModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],
