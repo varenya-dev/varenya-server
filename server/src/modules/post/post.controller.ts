@@ -29,7 +29,6 @@ export class PostController {
     @AuthUser() loggedInUser: LoggedInUser,
     @Body() updatePostDto: UpdatePostDto,
   ): Promise<PostModel> {
-    // NEED TO BE TESTED.
     return await this.postService.updatePost(loggedInUser, updatePostDto);
   }
 }
