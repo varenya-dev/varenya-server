@@ -19,7 +19,6 @@ export class PostController {
     @AuthUser() loggedInUser: LoggedInUser,
     @Body() createPostDto: CreatePostDto,
   ): Promise<PostModel> {
-    // NEEDS TESTING
     return await this.postService.createPost(loggedInUser, createPostDto);
   }
 }
