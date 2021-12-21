@@ -69,12 +69,12 @@ export class PostService {
     loggedInUser: LoggedInUser,
     updatePostDto: UpdatePostDto,
   ): Promise<Post> {
-    // TO BE TESTED.
     const postToBeUpdated = await this.postRepository.findOne({
       where: {
         id: updatePostDto.id,
         user: loggedInUser.databaseUser,
       },
+      relations: ['images'],
     });
 
     if (!postToBeUpdated) {
