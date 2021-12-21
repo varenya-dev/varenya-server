@@ -1,4 +1,3 @@
-import { DoctorModule } from './../doctor/doctor.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Global, Module } from '@nestjs/common';
 import { UserService } from './user.service';
