@@ -1,7 +1,8 @@
+import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { CreatePostDto } from './../../dto/post/new-post.dto';
 import { PostImage } from './../../models/post-image.model';
 import { PostCategory } from './../../models/post-category.model';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from 'src/models/post.model';
@@ -61,8 +62,72 @@ export class PostService {
     newPost.images = dbPostImages;
     newPost.user = loggedInUser.databaseUser;
 
-    const dbPost = await this.postRepository.save(newPost);
+    return await this.postRepository.save(newPost);
+  }
 
-    return dbPost;
+  public async updatePost(
+    loggedInUser: LoggedInUser,
+    updatePostDto: UpdatePostDto,
+  ): Promise<Post> {
+    // TO BE TESTED.
+    const postToBeUpdated = await this.postRepository.findOne({
+      where: {
+        id: updatePostDto.id,
+        user: loggedInUser.databaseUser,
+      },
+    });
+
+    if (!postToBeUpdated) {
+      throw new NotFoundException(
+        'Post not found for the given post ID and user',
+      );
+    }
+
+    const dbPostCategories = await Promise.all(
+      updatePostDto.categories.map(async (category) => {
+        const correctedCategory = category.toUpperCase();
+
+        const dbPostCategory = await this.postCategoryRepository.findOne({
+          where: {
+            categoryName: correctedCategory,
+          },
+        });
+
+        if (dbPostCategory) {
+          return dbPostCategory;
+        } else {
+          const newPostCategory = new PostCategory();
+          newPostCategory.categoryName = correctedCategory;
+
+          return await this.postCategoryRepository.save(newPostCategory);
+        }
+      }),
+    );
+
+    const dbPostImages = await Promise.all(
+      updatePostDto.images.map(async (image) => {
+        const dbImage = await this.postImageRepository.findOne({
+          where: {
+            imageUrl: image,
+          },
+        });
+
+        if (dbImage) {
+          return dbImage;
+        } else {
+          const newPostImage = new PostImage();
+
+          newPostImage.imageUrl = image;
+
+          return await this.postImageRepository.save(newPostImage);
+        }
+      }),
+    );
+
+    postToBeUpdated.body = updatePostDto.body;
+    postToBeUpdated.categories = dbPostCategories;
+    postToBeUpdated.images = dbPostImages;
+
+    return await this.postRepository.save(postToBeUpdated);
   }
 }
