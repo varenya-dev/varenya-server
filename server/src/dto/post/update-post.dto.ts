@@ -4,9 +4,13 @@ import {
   IsArray,
   IsNotEmpty,
   IsUrl,
+  IsUUID,
 } from 'class-validator';
 
-export class CreatePostDto {
+export class UpdatePostDto {
+  @IsUUID()
+  public id: string;
+
   @IsNotEmpty()
   public body: string;
 
