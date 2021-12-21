@@ -1,3 +1,6 @@
+import { PostModule } from './modules/post/post.module';
+import { PostImage } from './models/post-image.model';
+import { PostCategory } from './models/post-category.model';
 import { DoctorModule } from './modules/doctor/doctor.module';
 import { Specialization } from './models/specialization.model';
 import { AppointmentModule } from './modules/appointment/appointment.module';
@@ -10,6 +13,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './models/user.model';
 import { Doctor } from './models/doctor.model';
+import { Post } from './models/post.model';
 
 @Module({
   imports: [
@@ -22,7 +26,15 @@ import { Doctor } from './models/doctor.model';
       database: process.env.DATABASE_NAME,
       synchronize: true,
       logging: true,
-      entities: [User, Appointment, Specialization, Doctor],
+      entities: [
+        User,
+        Appointment,
+        Specialization,
+        Doctor,
+        PostCategory,
+        PostImage,
+        Post,
+      ],
     }),
     FirebaseModule,
     UserModule,
@@ -30,6 +42,7 @@ import { Doctor } from './models/doctor.model';
     NotificationModule,
     AppointmentModule,
     DoctorModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],
