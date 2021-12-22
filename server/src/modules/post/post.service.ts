@@ -1,3 +1,4 @@
+import { FetchPostsByCategoryDto } from './../../dto/post/fetch-posts-category.dto';
 import { DeletePostDto } from './../../dto/post/delete-post.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { CreatePostDto } from './../../dto/post/new-post.dto';
@@ -21,6 +22,24 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
   ) {}
+
+  public async fetchPostsByCategory(
+    fetchPostsByCategoryDto: FetchPostsByCategoryDto,
+  ): Promise<Post[]> {
+    // NEED TO TEST.
+    const postsByCategory = await this.postCategoryRepository.findOne({
+      where: {
+        categoryName: fetchPostsByCategoryDto.category.toUpperCase(),
+      },
+      relations: ['posts'],
+    });
+
+    if (postsByCategory) {
+      return postsByCategory.posts;
+    } else {
+      throw new NotFoundException('Category not found');
+    }
+  }
 
   public async createPost(
     loggedInUser: LoggedInUser,
