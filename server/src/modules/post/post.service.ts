@@ -26,7 +26,6 @@ export class PostService {
   public async fetchPostsByCategory(
     fetchPostsByCategoryDto: FetchPostsByCategoryDto,
   ): Promise<Post[]> {
-    // NEED TO TEST.
     const postsByCategory = await this.postCategoryRepository.findOne({
       where: {
         categoryName: fetchPostsByCategoryDto.category.toUpperCase(),
