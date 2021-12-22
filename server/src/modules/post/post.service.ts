@@ -30,7 +30,7 @@ export class PostService {
       where: {
         categoryName: fetchPostsByCategoryDto.category.toUpperCase(),
       },
-      relations: ['posts'],
+      relations: ['posts', 'posts.categories', 'posts.images', 'posts.user'],
     });
 
     if (postsByCategory) {
