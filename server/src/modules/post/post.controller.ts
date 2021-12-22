@@ -25,6 +25,12 @@ import { DeletePostDto } from 'src/dto/post/delete-post.dto';
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @Get()
+  @Role(Roles.Main, Roles.Professional)
+  public async fetchNewPosts(): Promise<PostModel[]> {
+    return await this.postService.fetchNewPosts();
+  }
+
   @Get('category')
   @Role(Roles.Main, Roles.Professional)
   public async fetchPostsByCategory(
