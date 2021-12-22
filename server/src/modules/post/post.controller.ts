@@ -1,3 +1,4 @@
+import { PostCategory } from './../../models/post-category.model';
 import { FetchPostsByCategoryDto } from './../../dto/post/fetch-posts-category.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { PostService } from './post.service';
@@ -37,6 +38,12 @@ export class PostController {
     @Query() fetchPostsByCategoryDto: FetchPostsByCategoryDto,
   ): Promise<PostModel[]> {
     return await this.postService.fetchPostsByCategory(fetchPostsByCategoryDto);
+  }
+
+  @Get('categories')
+  @Role(Roles.Main, Roles.Professional)
+  public async fetchCategories(): Promise<PostCategory[]> {
+    return await this.postService.fetchCategories();
   }
 
   @Post()
