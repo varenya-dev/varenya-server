@@ -30,7 +30,6 @@ export class PostController {
   public async fetchPostsByCategory(
     @Query() fetchPostsByCategoryDto: FetchPostsByCategoryDto,
   ): Promise<PostModel[]> {
-    // NEED TO TEST.
     return await this.postService.fetchPostsByCategory(fetchPostsByCategoryDto);
   }
 
