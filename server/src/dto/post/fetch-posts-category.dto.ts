@@ -1,6 +1,6 @@
 import { IsNotEmpty } from 'class-validator';
 
-export class FetchCategory {
+export class FetchPostsByCategoryDto {
   @IsNotEmpty()
   public category: string;
 }
