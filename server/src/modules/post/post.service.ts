@@ -40,6 +40,15 @@ export class PostService {
     }
   }
 
+  public async fetchNewPosts(): Promise<Post[]> {
+    return await this.postRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['images', 'user', 'categories'],
+    });
+  }
+
   public async createPost(
     loggedInUser: LoggedInUser,
     createPostDto: CreatePostDto,
