@@ -49,6 +49,10 @@ export class PostService {
     });
   }
 
+  public async fetchCategories(): Promise<PostCategory[]> {
+    return await this.postCategoryRepository.find();
+  }
+
   public async createPost(
     loggedInUser: LoggedInUser,
     createPostDto: CreatePostDto,
