@@ -1,3 +1,4 @@
+import { FetchPostsByCategoryDto } from './../../dto/post/fetch-posts-category.dto';
 import { DeletePostDto } from './../../dto/post/delete-post.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { CreatePostDto } from './../../dto/post/new-post.dto';
@@ -21,6 +22,36 @@ export class PostService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
   ) {}
+
+  public async fetchPostsByCategory(
+    fetchPostsByCategoryDto: FetchPostsByCategoryDto,
+  ): Promise<Post[]> {
+    const postsByCategory = await this.postCategoryRepository.findOne({
+      where: {
+        categoryName: fetchPostsByCategoryDto.category.toUpperCase(),
+      },
+      relations: ['posts', 'posts.categories', 'posts.images', 'posts.user'],
+    });
+
+    if (postsByCategory) {
+      return postsByCategory.posts;
+    } else {
+      throw new NotFoundException('Category not found');
+    }
+  }
+
+  public async fetchNewPosts(): Promise<Post[]> {
+    return await this.postRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['images', 'user', 'categories'],
+    });
+  }
+
+  public async fetchCategories(): Promise<PostCategory[]> {
+    return await this.postCategoryRepository.find();
+  }
 
   public async createPost(
     loggedInUser: LoggedInUser,

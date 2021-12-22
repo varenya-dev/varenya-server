@@ -1,7 +1,18 @@
+import { PostCategory } from './../../models/post-category.model';
+import { FetchPostsByCategoryDto } from './../../dto/post/fetch-posts-category.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { PostService } from './post.service';
 import { RoleAuthGuard } from 'src/guards/role-auth.guard';
-import { Body, Controller, Delete, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from 'src/decorators/role.decorator';
 import { Roles } from 'src/enum/roles.enum';
 import { CreatePostDto } from 'src/dto/post/new-post.dto';
@@ -14,6 +25,26 @@ import { DeletePostDto } from 'src/dto/post/delete-post.dto';
 @UseGuards(RoleAuthGuard)
 export class PostController {
   constructor(private readonly postService: PostService) {}
+
+  @Get()
+  @Role(Roles.Main, Roles.Professional)
+  public async fetchNewPosts(): Promise<PostModel[]> {
+    return await this.postService.fetchNewPosts();
+  }
+
+  @Get('category')
+  @Role(Roles.Main, Roles.Professional)
+  public async fetchPostsByCategory(
+    @Query() fetchPostsByCategoryDto: FetchPostsByCategoryDto,
+  ): Promise<PostModel[]> {
+    return await this.postService.fetchPostsByCategory(fetchPostsByCategoryDto);
+  }
+
+  @Get('categories')
+  @Role(Roles.Main, Roles.Professional)
+  public async fetchCategories(): Promise<PostCategory[]> {
+    return await this.postService.fetchCategories();
+  }
 
   @Post()
   @Role(Roles.Main, Roles.Professional)
