@@ -37,6 +37,7 @@ export class PostService {
         'posts.images',
         'posts.user',
         'posts.comments',
+        'posts.comments.user',
       ],
     });
 
@@ -55,7 +56,7 @@ export class PostService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['images', 'user', 'categories', 'comments'],
+      relations: ['images', 'user', 'categories', 'comments', 'comments.user'],
     });
   }
 
