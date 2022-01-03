@@ -32,7 +32,6 @@ export class CommentsController {
     @AuthUser() loggedInUser: LoggedInUser,
     @Body() updateCommentDto: UpdateCommentDto,
   ): Promise<PostModel> {
-    // NEED TO TEST.
     return await this.commentsService.updateComment(
       loggedInUser,
       updateCommentDto,
