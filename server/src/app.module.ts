@@ -1,3 +1,4 @@
+import { CommentsModule } from './modules/comments/comments.module';
 import { PostModule } from './modules/post/post.module';
 import { PostImage } from './models/post-image.model';
 import { PostCategory } from './models/post-category.model';
@@ -45,6 +46,7 @@ import { RandomName } from './models/random-name.model';
     AppointmentModule,
     DoctorModule,
     PostModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [],

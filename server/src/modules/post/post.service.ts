@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from 'src/models/post.model';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
+import { PostType } from 'src/enum/post-type.enum';
 
 @Injectable()
 export class PostService {
@@ -30,7 +31,14 @@ export class PostService {
       where: {
         categoryName: fetchPostsByCategoryDto.category.toUpperCase(),
       },
-      relations: ['posts', 'posts.categories', 'posts.images', 'posts.user'],
+      relations: [
+        'posts',
+        'posts.categories',
+        'posts.images',
+        'posts.user',
+        'posts.comments',
+        'posts.comments.user',
+      ],
     });
 
     if (postsByCategory) {
@@ -42,10 +50,13 @@ export class PostService {
 
   public async fetchNewPosts(): Promise<Post[]> {
     return await this.postRepository.find({
+      where: {
+        postType: PostType.Post,
+      },
       order: {
         createdAt: 'DESC',
       },
-      relations: ['images', 'user', 'categories'],
+      relations: ['images', 'user', 'categories', 'comments', 'comments.user'],
     });
   }
 
