@@ -22,6 +22,9 @@ export class User {
   @Column()
   public role: Roles;
 
+  @OneToOne(() => Doctor, (doctor) => doctor.user, { eager: true })
+  public doctor: Doctor;
+
   @OneToMany(() => Appointment, (appointment) => appointment.patientUser, {
     cascade: true,
   })
