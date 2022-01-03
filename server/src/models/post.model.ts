@@ -1,3 +1,4 @@
+import { PostType } from 'src/enum/post-type.enum';
 import {
   Column,
   CreateDateColumn,
@@ -18,6 +19,9 @@ export class Post {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
+  @Column({ default: PostType.Post })
+  public postType: PostType;
+
   @Column()
   public body: string;
 
@@ -26,6 +30,12 @@ export class Post {
 
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   public user: User;
+
+  @OneToMany(() => Post, (post) => post.post, { cascade: true })
+  comments: Post[];
+
+  @ManyToOne(() => Post, (post) => post.comments, { onDelete: 'CASCADE' })
+  post: Post;
 
   @ManyToMany(() => PostCategory, (postCategory) => postCategory.posts, {
     eager: true,
