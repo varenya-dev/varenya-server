@@ -19,7 +19,6 @@ export class CommentsController {
     @AuthUser() loggedInUser: LoggedInUser,
     @Body() createCommentDto: CreateCommentDto,
   ): Promise<PostModel> {
-    // NEED TO TEST
     return await this.commentsService.createComment(
       loggedInUser,
       createCommentDto,
