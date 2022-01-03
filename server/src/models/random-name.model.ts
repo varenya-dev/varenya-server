@@ -15,7 +15,7 @@ export class RandomName {
   @Column()
   public randomName: string;
 
-  @OneToOne(() => User, (user) => user.randomName)
+  @OneToOne(() => User, (user) => user.randomName, { onDelete: 'CASCADE' })
   @JoinColumn()
   public user: User;
 }

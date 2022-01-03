@@ -5,7 +5,6 @@ import { Roles } from './../enum/roles.enum';
 import {
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -23,10 +22,16 @@ export class User {
   @Column()
   public role: Roles;
 
-  @OneToOne(() => RandomName, (randomName) => randomName.user, { eager: true })
+  @OneToOne(() => RandomName, (randomName) => randomName.user, {
+    eager: true,
+    cascade: true,
+  })
   public randomName: RandomName;
 
-  @OneToOne(() => Doctor, (doctor) => doctor.user, { eager: true })
+  @OneToOne(() => Doctor, (doctor) => doctor.user, {
+    eager: true,
+    cascade: true,
+  })
   public doctor: Doctor;
 
   @OneToMany(() => Appointment, (appointment) => appointment.patientUser, {
