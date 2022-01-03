@@ -45,7 +45,6 @@ export class CommentsController {
     @AuthUser() loggedInUser: LoggedInUser,
     @Body() deleteCommentDto: DeleteCommentDto,
   ): Promise<PostModel> {
-    // NEED TO TEST.
     return await this.commentsService.deleteComment(
       loggedInUser,
       deleteCommentDto,
