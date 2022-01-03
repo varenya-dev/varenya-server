@@ -1,3 +1,4 @@
+import { DeleteCommentDto } from './../../dto/comments/delete-comment.dto';
 import { UpdateCommentDto } from './../../dto/comments/update-comment.dto';
 import { CreateCommentDto } from './../../dto/comments/create-comment.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -51,5 +52,25 @@ export class CommentsService {
     checkComment.body = updateCommentDto.comment;
 
     return await this.postRepository.save(checkComment);
+  }
+
+  public async deleteComment(
+    loggedInUser: LoggedInUser,
+    deleteCommentDto: DeleteCommentDto,
+  ): Promise<Post> {
+    // NEED TO TEST
+    const checkComment = await this.postRepository.findOne({
+      id: deleteCommentDto.commentId,
+      user: loggedInUser.databaseUser,
+    });
+
+    if (!checkComment) {
+      throw new NotFoundException('Comment could not be found.');
+    }
+
+    checkComment.post = null;
+    await this.postRepository.save(checkComment);
+
+    return await this.postRepository.remove(checkComment);
   }
 }
