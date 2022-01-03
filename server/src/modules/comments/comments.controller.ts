@@ -1,7 +1,8 @@
+import { UpdateCommentDto } from './../../dto/comments/update-comment.dto';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './../../dto/comments/create-comment.dto';
 import { RoleAuthGuard } from './../../guards/role-auth.guard';
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
 import { Role } from 'src/decorators/role.decorator';
 import { Roles } from 'src/enum/roles.enum';
 import { AuthUser } from 'src/decorators/auth-user.decorator';
@@ -23,5 +24,14 @@ export class CommentsController {
       loggedInUser,
       createCommentDto,
     );
+  }
+
+  @Put()
+  @Role(Roles.Main, Roles.Professional)
+  public async updateComment(
+    @Body() updateCommentDto: UpdateCommentDto,
+  ): Promise<PostModel> {
+    // NEED TO TEST.
+    return await this.commentsService.updateComment(updateCommentDto);
   }
 }
