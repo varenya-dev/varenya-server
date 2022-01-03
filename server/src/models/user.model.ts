@@ -1,3 +1,4 @@
+import { RandomName } from './random-name.model';
 import { Doctor } from './doctor.model';
 import { Appointment } from './appointment.model';
 import { Roles } from './../enum/roles.enum';
@@ -21,6 +22,9 @@ export class User {
 
   @Column()
   public role: Roles;
+
+  @OneToOne(() => RandomName, (randomName) => randomName.user, { eager: true })
+  public randomName: RandomName;
 
   @OneToOne(() => Doctor, (doctor) => doctor.user, { eager: true })
   public doctor: Doctor;

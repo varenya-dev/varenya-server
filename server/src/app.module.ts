@@ -14,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './models/user.model';
 import { Doctor } from './models/doctor.model';
 import { Post } from './models/post.model';
+import { RandomName } from './models/random-name.model';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { Post } from './models/post.model';
         PostCategory,
         PostImage,
         Post,
+        RandomName,
       ],
     }),
     FirebaseModule,
