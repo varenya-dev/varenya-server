@@ -17,7 +17,6 @@ export class CommentsService {
     loggedInUser: LoggedInUser,
     createCommentDto: CreateCommentDto,
   ): Promise<Post> {
-    // NEED TO TEST.
     const checkPost = await this.postRepository.findOne({
       id: createCommentDto.postId,
     });
