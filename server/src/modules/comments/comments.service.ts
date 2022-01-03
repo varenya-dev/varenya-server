@@ -1,3 +1,4 @@
+import { UpdateCommentDto } from './../../dto/comments/update-comment.dto';
 import { CreateCommentDto } from './../../dto/comments/create-comment.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -32,5 +33,22 @@ export class CommentsService {
     newComment.post = checkPost;
 
     return await this.postRepository.save(newComment);
+  }
+
+  public async updateComment(
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<Post> {
+    // NEED TO TEST.
+    const checkComment = await this.postRepository.findOne({
+      id: updateCommentDto.commentId,
+    });
+
+    if (!checkComment) {
+      throw new NotFoundException('Comment could not be found.');
+    }
+
+    checkComment.body = updateCommentDto.comment;
+
+    return await this.postRepository.save(checkComment);
   }
 }
