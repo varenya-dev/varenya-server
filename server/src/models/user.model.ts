@@ -1,10 +1,10 @@
+import { RandomName } from './random-name.model';
 import { Doctor } from './doctor.model';
 import { Appointment } from './appointment.model';
 import { Roles } from './../enum/roles.enum';
 import {
   Column,
   Entity,
-  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -21,6 +21,18 @@ export class User {
 
   @Column()
   public role: Roles;
+
+  @OneToOne(() => RandomName, (randomName) => randomName.user, {
+    eager: true,
+    cascade: true,
+  })
+  public randomName: RandomName;
+
+  @OneToOne(() => Doctor, (doctor) => doctor.user, {
+    eager: true,
+    cascade: true,
+  })
+  public doctor: Doctor;
 
   @OneToMany(() => Appointment, (appointment) => appointment.patientUser, {
     cascade: true,

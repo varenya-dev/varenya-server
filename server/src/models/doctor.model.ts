@@ -50,7 +50,7 @@ export class Doctor {
   @JoinTable()
   public specializations: Specialization[];
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.doctor)
   @JoinColumn()
   public user: User;
 
