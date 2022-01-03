@@ -58,7 +58,6 @@ export class CommentsService {
     loggedInUser: LoggedInUser,
     deleteCommentDto: DeleteCommentDto,
   ): Promise<Post> {
-    // NEED TO TEST
     const checkComment = await this.postRepository.findOne({
       id: deleteCommentDto.commentId,
       user: loggedInUser.databaseUser,
