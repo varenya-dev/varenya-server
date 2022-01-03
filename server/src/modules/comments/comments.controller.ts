@@ -29,9 +29,13 @@ export class CommentsController {
   @Put()
   @Role(Roles.Main, Roles.Professional)
   public async updateComment(
+    @AuthUser() loggedInUser: LoggedInUser,
     @Body() updateCommentDto: UpdateCommentDto,
   ): Promise<PostModel> {
     // NEED TO TEST.
-    return await this.commentsService.updateComment(updateCommentDto);
+    return await this.commentsService.updateComment(
+      loggedInUser,
+      updateCommentDto,
+    );
   }
 }

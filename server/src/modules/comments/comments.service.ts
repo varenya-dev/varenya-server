@@ -36,11 +36,12 @@ export class CommentsService {
   }
 
   public async updateComment(
+    loggedInUser: LoggedInUser,
     updateCommentDto: UpdateCommentDto,
   ): Promise<Post> {
-    // NEED TO TEST.
     const checkComment = await this.postRepository.findOne({
       id: updateCommentDto.commentId,
+      user: loggedInUser.databaseUser,
     });
 
     if (!checkComment) {
