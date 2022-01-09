@@ -24,6 +24,22 @@ export class PostService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
+  public async fetchPostById(id: string): Promise<Post> {
+    const fetchedPost = await this.postRepository.findOne({
+      where: {
+        id: id,
+        postType: PostType.Post,
+      },
+      relations: ['images', 'user', 'categories', 'comments', 'comments.user'],
+    });
+
+    if (fetchedPost) {
+      return fetchedPost;
+    } else {
+      throw new NotFoundException('Post Not Found');
+    }
+  }
+
   public async fetchPostsByCategory(
     fetchPostsByCategoryDto: FetchPostsByCategoryDto,
   ): Promise<Post[]> {

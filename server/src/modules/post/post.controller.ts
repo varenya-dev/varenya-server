@@ -1,3 +1,4 @@
+import { FetchPostByIdDto } from './../../dto/post/fetch-post-id.dto';
 import { PostCategory } from './../../models/post-category.model';
 import { FetchPostsByCategoryDto } from './../../dto/post/fetch-posts-category.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
@@ -8,6 +9,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -27,6 +29,14 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Get()
+  @Role(Roles.Main, Roles.Professional)
+  public async fetchPostById(
+    @Query() fetchPostByIdDto: FetchPostByIdDto,
+  ): Promise<PostModel> {
+    return await this.postService.fetchPostById(fetchPostByIdDto.postId);
+  }
+
+  @Get('new')
   @Role(Roles.Main, Roles.Professional)
   public async fetchNewPosts(): Promise<PostModel[]> {
     return await this.postService.fetchNewPosts();
