@@ -36,7 +36,7 @@ export class PostController {
     return await this.postService.fetchPostById(fetchPostByIdDto.postId);
   }
 
-  @Get()
+  @Get('new')
   @Role(Roles.Main, Roles.Professional)
   public async fetchNewPosts(): Promise<PostModel[]> {
     return await this.postService.fetchNewPosts();
