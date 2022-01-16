@@ -12,7 +12,7 @@ import { User } from './user.model';
 
 @Entity()
 export class Activity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   public id: string;
 
   @Column()
