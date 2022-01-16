@@ -1,3 +1,4 @@
+import { ActivityModule } from './modules/activity/activity.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { PostModule } from './modules/post/post.module';
 import { PostImage } from './models/post-image.model';
@@ -49,6 +50,7 @@ import { Activity } from './models/activity.model';
     DoctorModule,
     PostModule,
     CommentsModule,
+    ActivityModule,
   ],
   controllers: [],
   providers: [],
