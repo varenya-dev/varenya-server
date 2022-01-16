@@ -1,3 +1,4 @@
+import { ActivityService } from './../activity/activity.service';
 import { FetchPostsByCategoryDto } from './../../dto/post/fetch-posts-category.dto';
 import { DeletePostDto } from './../../dto/post/delete-post.dto';
 import { UpdatePostDto } from './../../dto/post/update-post.dto';
@@ -10,6 +11,7 @@ import { Repository } from 'typeorm';
 import { Post } from 'src/models/post.model';
 import { LoggedInUser } from 'src/dto/logged-in-user.dto';
 import { PostType } from 'src/enum/post-type.enum';
+import { Roles } from 'src/enum/roles.enum';
 
 @Injectable()
 export class PostService {
@@ -22,6 +24,8 @@ export class PostService {
 
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+
+    private readonly activityService: ActivityService,
   ) {}
 
   public async fetchPostById(id: string): Promise<Post> {
@@ -121,7 +125,16 @@ export class PostService {
     newPost.images = dbPostImages;
     newPost.user = loggedInUser.databaseUser;
 
-    return await this.postRepository.save(newPost);
+    const savedPost = await this.postRepository.save(newPost);
+
+    if (loggedInUser.databaseUser.role === Roles.Main) {
+      await this.activityService.recordPost(
+        loggedInUser.databaseUser,
+        savedPost,
+      );
+    }
+
+    return savedPost;
   }
 
   public async updatePost(

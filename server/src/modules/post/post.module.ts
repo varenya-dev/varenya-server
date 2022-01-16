@@ -1,3 +1,4 @@
+import { ActivityModule } from './../activity/activity.module';
 import { PostImage } from './../../models/post-image.model';
 import { PostCategory } from './../../models/post-category.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +8,10 @@ import { PostService } from './post.service';
 import { Post } from 'src/models/post.model';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PostCategory, PostImage, Post])],
+  imports: [
+    TypeOrmModule.forFeature([PostCategory, PostImage, Post]),
+    ActivityModule,
+  ],
   controllers: [PostController],
   providers: [PostService],
 })

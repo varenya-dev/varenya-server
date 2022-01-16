@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -13,6 +14,9 @@ import { User } from './user.model';
 export class Activity {
   @PrimaryGeneratedColumn()
   public id: string;
+
+  @Column()
+  public activityType: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE', eager: true, nullable: true })
   public user: User;
