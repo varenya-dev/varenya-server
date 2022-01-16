@@ -16,6 +16,7 @@ import { User } from './models/user.model';
 import { Doctor } from './models/doctor.model';
 import { Post } from './models/post.model';
 import { RandomName } from './models/random-name.model';
+import { Activity } from './models/activity.model';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { RandomName } from './models/random-name.model';
         PostImage,
         Post,
         RandomName,
+        Activity,
       ],
     }),
     FirebaseModule,
