@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from 'src/models/activity.model';
+import { Appointment } from 'src/models/appointment.model';
 import { Post } from 'src/models/post.model';
 import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
@@ -17,6 +18,18 @@ export class ActivityService {
     newActivity.user = user;
     newActivity.post = post;
     newActivity.activityType = 'POST';
+
+    return await this.activityRepository.save(newActivity);
+  }
+
+  public async recordAppointment(
+    user: User,
+    appointment: Appointment,
+  ): Promise<Activity> {
+    const newActivity = new Activity();
+    newActivity.user = user;
+    newActivity.appointment = appointment;
+    newActivity.activityType = 'APPOINTMENT';
 
     return await this.activityRepository.save(newActivity);
   }

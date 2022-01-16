@@ -12,6 +12,7 @@ import { Between, Repository } from 'typeorm';
 import { PatientDto } from 'src/dto/patient.dto';
 import { Doctor } from 'src/models/doctor.model';
 import { FetchBookedAppointmentsDto } from 'src/dto/appointment/fetch-booked-appointments.dto';
+import { ActivityService } from '../activity/activity.service';
 
 @Injectable()
 export class AppointmentService {
@@ -22,6 +23,7 @@ export class AppointmentService {
     private readonly doctorService: DoctorService,
     private readonly firebaseService: FirebaseService,
     private readonly notificationService: NotificationService,
+    private readonly activityService: ActivityService,
   ) {}
 
   public async fetchBookedAppointmentSlots(
@@ -190,7 +192,16 @@ export class AppointmentService {
     const appointmentDetails = new Appointment(patientUser, doctorUser);
     appointmentDetails.scheduledFor = createAppointmentDto.timing;
 
-    return await this.appointmentRepository.save(appointmentDetails);
+    const savedAppointment = await this.appointmentRepository.save(
+      appointmentDetails,
+    );
+
+    await this.activityService.recordAppointment(
+      loggedInUser.databaseUser,
+      savedAppointment,
+    );
+
+    return savedAppointment;
   }
 
   public async updateAppointment(
