@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Post } from './post.model';
+import { Activity } from './activity.model';
 
 @Entity()
 export class User {
@@ -43,4 +44,9 @@ export class User {
     cascade: true,
   })
   public posts: Post[];
+
+  @OneToMany(() => Activity, (activity) => activity.user, {
+    cascade: true,
+  })
+  public activities: Activity[];
 }

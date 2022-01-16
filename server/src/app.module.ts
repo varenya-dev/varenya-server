@@ -1,3 +1,4 @@
+import { ActivityModule } from './modules/activity/activity.module';
 import { CommentsModule } from './modules/comments/comments.module';
 import { PostModule } from './modules/post/post.module';
 import { PostImage } from './models/post-image.model';
@@ -16,6 +17,7 @@ import { User } from './models/user.model';
 import { Doctor } from './models/doctor.model';
 import { Post } from './models/post.model';
 import { RandomName } from './models/random-name.model';
+import { Activity } from './models/activity.model';
 
 @Module({
   imports: [
@@ -37,6 +39,7 @@ import { RandomName } from './models/random-name.model';
         PostImage,
         Post,
         RandomName,
+        Activity,
       ],
     }),
     FirebaseModule,
@@ -47,6 +50,7 @@ import { RandomName } from './models/random-name.model';
     DoctorModule,
     PostModule,
     CommentsModule,
+    ActivityModule,
   ],
   controllers: [],
   providers: [],
