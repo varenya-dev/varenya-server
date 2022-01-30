@@ -22,7 +22,7 @@ export class Post {
   @Column({ default: PostType.Post })
   public postType: PostType;
 
-  @Column()
+  @Column({ nullable: true })
   public title: string;
 
   @Column()
