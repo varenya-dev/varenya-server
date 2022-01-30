@@ -17,6 +17,10 @@ export class NotificationService {
       loggedInUser,
     );
 
+    if (filteredParticipants.length === 0) {
+      return;
+    }
+
     await this.sendNotification(
       filteredParticipants,
       {
@@ -152,6 +156,10 @@ export class NotificationService {
     notification: { title: string; body: string },
   ): Promise<void> {
     const fcmTokens = await this.fetchFcmTokensByUserIds(recipientIds);
+
+    if (fcmTokens.length === 0) {
+      return;
+    }
 
     await this.firebaseService.firebaseMessaging.sendToDevice(
       fcmTokens,

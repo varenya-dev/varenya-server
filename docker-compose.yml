@@ -31,10 +31,25 @@ services:
       - varenya_postgres:/var/lib/postgresql/data
     networks:
       - varenya_net
+      - pg_net
+
+  varenya_pgadmin:
+    container_name: varenya_pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - '127.0.0.1:9000:80'
+    networks:
+      - pg_net
 
 networks:
   varenya_net:
     name: varenya_net
+  pg_net:
+    name: pg_net
 
 volumes:
   varenya_postgres:
