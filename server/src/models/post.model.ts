@@ -23,6 +23,9 @@ export class Post {
   public postType: PostType;
 
   @Column()
+  public title: string;
+
+  @Column()
   public body: string;
 
   @OneToMany(() => PostImage, (postImage) => postImage.post, { cascade: true })

@@ -12,6 +12,9 @@ export class UpdatePostDto {
   public id: string;
 
   @IsNotEmpty()
+  public title: string;
+
+  @IsNotEmpty()
   public body: string;
 
   @IsArray()

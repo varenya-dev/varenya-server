@@ -120,6 +120,7 @@ export class PostService {
     );
 
     const newPost = new Post();
+    newPost.title = createPostDto.title;
     newPost.body = createPostDto.body;
     newPost.categories = dbPostCategories;
     newPost.images = dbPostImages;
@@ -198,6 +199,7 @@ export class PostService {
       }),
     );
 
+    postToBeUpdated.title = updatePostDto.title;
     postToBeUpdated.body = updatePostDto.body;
     postToBeUpdated.categories = dbPostCategories;
     postToBeUpdated.images = dbPostImages;
