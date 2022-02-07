@@ -34,7 +34,17 @@ export class PostService {
         id: id,
         postType: PostType.Post,
       },
-      relations: ['images', 'user', 'categories', 'comments', 'comments.user'],
+      relations: [
+        'images',
+        'user',
+        'categories',
+        'comments',
+        'comments.user',
+        'comments.user.randomName',
+        'comments.user.doctor',
+        'user.randomName',
+        'user.doctor',
+      ],
     });
 
     if (fetchedPost) {
@@ -58,6 +68,10 @@ export class PostService {
         'posts.user',
         'posts.comments',
         'posts.comments.user',
+        'posts.comments.user.randomName',
+        'posts.comments.user.doctor',
+        'posts.user.randomName',
+        'posts.user.doctor',
       ],
     });
 
@@ -76,7 +90,17 @@ export class PostService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['images', 'user', 'categories', 'comments', 'comments.user'],
+      relations: [
+        'images',
+        'user',
+        'categories',
+        'comments',
+        'comments.user',
+        'comments.user.randomName',
+        'comments.user.doctor',
+        'user.randomName',
+        'user.doctor',
+      ],
     });
   }
 

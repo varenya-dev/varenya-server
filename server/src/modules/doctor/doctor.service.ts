@@ -82,7 +82,9 @@ export class DoctorService {
       filterDoctorDto.jobTitle === 'EMPTY' &&
       filterDoctorDto.specializations.length === 0
     ) {
-      return await this.doctorRepository.find();
+      return await this.doctorRepository.find({
+        relations: ['user'],
+      });
     } else if (
       filterDoctorDto.jobTitle !== 'EMPTY' &&
       filterDoctorDto.specializations.length === 0
@@ -117,6 +119,7 @@ export class DoctorService {
       where: {
         jobTitle: Equal(jobTitle),
       },
+      relations: ['user'],
     });
   }
 
@@ -128,7 +131,7 @@ export class DoctorService {
         where: {
           specialization: In(specializations),
         },
-        relations: ['doctors'],
+        relations: ['doctors', 'doctors.user'],
       },
     );
 
