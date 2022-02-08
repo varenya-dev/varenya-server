@@ -1,5 +1,5 @@
 import { RandomName } from './../../models/random-name.model';
-import { Injectable, forwardRef } from '@nestjs/common';
+import { Injectable, forwardRef, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
@@ -35,9 +35,18 @@ export class UserService {
   }
 
   public async findOneUserByFirebaseId(firebaseId: string): Promise<User> {
-    return await this.userRepository.findOneOrFail({
-      firebaseId,
+    const user = await this.userRepository.findOneOrFail({
+      where: {
+        firebaseId,
+      },
+      relations: ['randomName', 'doctor'],
     });
+
+    if (user) {
+      return user;
+    } else {
+      throw new NotFoundException('User does not exist');
+    }
   }
 
   public async saveUser(user: User): Promise<User> {

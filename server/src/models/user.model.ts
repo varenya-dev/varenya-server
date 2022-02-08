@@ -24,13 +24,11 @@ export class User {
   public role: Roles;
 
   @OneToOne(() => RandomName, (randomName) => randomName.user, {
-    eager: true,
     cascade: true,
   })
   public randomName: RandomName;
 
   @OneToOne(() => Doctor, (doctor) => doctor.user, {
-    eager: true,
     cascade: true,
   })
   public doctor: Doctor;
