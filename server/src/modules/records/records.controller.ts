@@ -1,3 +1,4 @@
+import { PatientDto } from 'src/dto/patient.dto';
 import { Doctor } from 'src/models/doctor.model';
 import { RoleAuthGuard } from './../../guards/role-auth.guard';
 import { Controller, Get, UseGuards } from '@nestjs/common';
@@ -13,10 +14,12 @@ export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}
 
   @Get()
-  @Role(Roles.Main)
+  @Role(Roles.Main, Roles.Professional)
   public async fetchRecords(
     @AuthUser() loggedInUser: LoggedInUser,
-  ): Promise<Doctor[]> {
-    return await this.recordsService.fetchLinkedDoctors(loggedInUser);
+  ): Promise<Doctor[] | PatientDto[]> {
+    if (loggedInUser.databaseUser.role === Roles.Main)
+      return await this.recordsService.fetchLinkedDoctors(loggedInUser);
+    else return await this.recordsService.fetchLinkedPatients(loggedInUser);
   }
 }
