@@ -5,6 +5,7 @@ import { Roles } from './../enum/roles.enum';
 import {
   Column,
   Entity,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -47,4 +48,7 @@ export class User {
     cascade: true,
   })
   public activities: Activity[];
+
+  @ManyToMany(() => Doctor, (doctor) => doctor.patients, { eager: false })
+  public doctors: Doctor[];
 }
