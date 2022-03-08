@@ -59,7 +59,10 @@ export class Doctor {
   })
   public appointments: Appointment[];
 
-  @ManyToMany(() => User, (user) => user.doctors, { eager: false })
+  @ManyToMany(() => User, (user) => user.doctors, {
+    eager: false,
+    cascade: true,
+  })
   @JoinTable()
   public patients: User[];
 }
