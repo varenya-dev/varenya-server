@@ -13,6 +13,7 @@ import { PatientDto } from 'src/dto/patient.dto';
 import { Doctor } from 'src/models/doctor.model';
 import { FetchBookedAppointmentsDto } from 'src/dto/appointment/fetch-booked-appointments.dto';
 import { ActivityService } from '../activity/activity.service';
+import { RecordsService } from '../records/records.service';
 
 @Injectable()
 export class AppointmentService {
@@ -24,6 +25,7 @@ export class AppointmentService {
     private readonly firebaseService: FirebaseService,
     private readonly notificationService: NotificationService,
     private readonly activityService: ActivityService,
+    private readonly recordsService: RecordsService,
   ) {}
 
   public async fetchBookedAppointmentSlots(
@@ -199,6 +201,11 @@ export class AppointmentService {
     await this.activityService.recordAppointment(
       loggedInUser.databaseUser,
       savedAppointment,
+    );
+
+    await this.recordsService.linkDoctorAndUser(
+      doctorUser.id,
+      loggedInUser.databaseUser.id,
     );
 
     return savedAppointment;

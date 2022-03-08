@@ -18,6 +18,7 @@ import { Doctor } from './models/doctor.model';
 import { Post } from './models/post.model';
 import { RandomName } from './models/random-name.model';
 import { Activity } from './models/activity.model';
+import { RecordsModule } from './modules/records/records.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { Activity } from './models/activity.model';
     PostModule,
     CommentsModule,
     ActivityModule,
+    RecordsModule,
   ],
   controllers: [],
   providers: [],

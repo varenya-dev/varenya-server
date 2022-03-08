@@ -1,7 +1,7 @@
 export class PatientDto {
   public id: string;
   public fullName: string;
-  public imageUrl;
+  public imageUrl: string;
 
   constructor(id: string, fullName: string, imageUrl: string) {
     this.id = id;
