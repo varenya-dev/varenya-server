@@ -1,3 +1,4 @@
+import { RecordsModule } from './../records/records.module';
 import { ActivityModule } from './../activity/activity.module';
 import { DoctorModule } from './../doctor/doctor.module';
 import { Module } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { AppointmentController } from './appointment.controller';
     TypeOrmModule.forFeature([Appointment]),
     DoctorModule,
     ActivityModule,
+    RecordsModule,
   ],
   providers: [AppointmentService],
   controllers: [AppointmentController],
