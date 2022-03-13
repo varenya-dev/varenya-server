@@ -3,6 +3,7 @@ import { ResponseNotificationDto } from './../../dto/notification/response-notif
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Injectable } from '@nestjs/common';
+import { Roles } from 'src/enum/roles.enum';
 
 @Injectable()
 export class NotificationService {
@@ -25,6 +26,7 @@ export class NotificationService {
       filteredParticipants,
       {
         thread: chatNotificationDto.threadId,
+        byUser: loggedInUser.firebaseUser.uid,
         type: 'chat',
       },
       {
