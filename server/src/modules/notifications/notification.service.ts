@@ -18,6 +18,11 @@ export class NotificationService {
       loggedInUser,
     );
 
+    const displayName =
+      loggedInUser.databaseUser.role === Roles.Main
+        ? loggedInUser.databaseUser.randomName.randomName
+        : loggedInUser.firebaseUser.displayName;
+
     if (filteredParticipants.length === 0) {
       return;
     }
@@ -30,7 +35,7 @@ export class NotificationService {
         type: 'chat',
       },
       {
-        title: `${loggedInUser.firebaseUser.displayName} sent you a message!`,
+        title: `${displayName} sent you a message!`,
         body: chatNotificationDto.message,
       },
     );
