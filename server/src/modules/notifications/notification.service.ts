@@ -3,6 +3,7 @@ import { ResponseNotificationDto } from './../../dto/notification/response-notif
 import { ChatNotificationDto } from './../../dto/notification/chat-notification.dto';
 import { FirebaseService } from '../firebase/firebase.service';
 import { Injectable } from '@nestjs/common';
+import { Roles } from 'src/enum/roles.enum';
 
 @Injectable()
 export class NotificationService {
@@ -17,6 +18,11 @@ export class NotificationService {
       loggedInUser,
     );
 
+    const displayName =
+      loggedInUser.databaseUser.role === Roles.Main
+        ? loggedInUser.databaseUser.randomName.randomName
+        : loggedInUser.firebaseUser.displayName;
+
     if (filteredParticipants.length === 0) {
       return;
     }
@@ -25,10 +31,11 @@ export class NotificationService {
       filteredParticipants,
       {
         thread: chatNotificationDto.threadId,
+        byUser: loggedInUser.firebaseUser.uid,
         type: 'chat',
       },
       {
-        title: `${loggedInUser.firebaseUser.displayName} sent you a message!`,
+        title: `${displayName} sent you a message!`,
         body: chatNotificationDto.message,
       },
     );
