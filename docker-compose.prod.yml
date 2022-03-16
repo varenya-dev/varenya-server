@@ -1,0 +1,42 @@
+version: '3.7'
+
+services:
+  varenya_server_prod:
+    build:
+      context: server
+      dockerfile: prod.Dockerfile
+    container_name: varenya_server_prod
+    env_file:
+      - server.prod.env
+      - firebase-admin.prod.env
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+    networks:
+      - varenya_prod_net
+    depends_on:
+      - varenya_postgres_prod
+
+  varenya_postgres_prod:
+    image: postgres
+    container_name: varenya_postgres_prod
+    restart: always
+    ports:
+      - '127.0.0.1:8888:5432'
+      - '5432:5432'
+    env_file:
+      - postgres.env
+    volumes:
+      - varenya_postgres_prod:/var/lib/postgresql/data
+    networks:
+      - varenya_prod_net
+
+networks:
+  varenya_prod_net:
+    name: varenya_prod_net
+
+volumes:
+  varenya_postgres_prod:
+    driver: local
