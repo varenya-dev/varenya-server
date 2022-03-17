@@ -6,6 +6,9 @@ export class PostCategory {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
+  @Column({ select: false })
+  public key: string;
+
   @Column()
   public categoryName: string;
 
