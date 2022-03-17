@@ -5,7 +5,7 @@ import { UpdatePostDto } from './../../dto/post/update-post.dto';
 import { CreatePostDto } from './../../dto/post/new-post.dto';
 import { PostImage } from './../../models/post-image.model';
 import { PostCategory } from './../../models/post-category.model';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from 'src/models/post.model';
@@ -14,7 +14,7 @@ import { PostType } from 'src/enum/post-type.enum';
 import { Roles } from 'src/enum/roles.enum';
 
 @Injectable()
-export class PostService {
+export class PostService implements OnModuleInit {
   constructor(
     @InjectRepository(PostCategory)
     private readonly postCategoryRepository: Repository<PostCategory>,
@@ -27,6 +27,31 @@ export class PostService {
 
     private readonly activityService: ActivityService,
   ) {}
+
+  async onModuleInit(): Promise<void> {
+    const categories: { key: string; categoryName: string }[] = [
+      { key: 'DEPRESSION', categoryName: 'DEPRESSION' },
+      { key: 'ANXIETY', categoryName: 'ANXIETY' },
+      { key: 'BIPOLAR', categoryName: 'BIPOLAR' },
+      { key: 'PTSD', categoryName: 'PTSD' },
+      { key: 'SUCCESS_STORY', categoryName: 'SUCCESS STORY' },
+    ];
+
+    categories.forEach(async (category) => {
+      const fetchedCategory = await this.postCategoryRepository.findOne({
+        where: {
+          key: category.key,
+        },
+      });
+
+      if (!fetchedCategory) {
+        const categoryModel = new PostCategory();
+        categoryModel.key = category.key;
+        categoryModel.categoryName = category.categoryName;
+        await this.postCategoryRepository.save(categoryModel);
+      }
+    });
+  }
 
   public async fetchPostById(id: string): Promise<Post> {
     const fetchedPost = await this.postRepository.findOne({
